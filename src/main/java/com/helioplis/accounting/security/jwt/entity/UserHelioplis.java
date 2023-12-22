@@ -9,7 +9,7 @@ import lombok.Data;
 @Data
 @Entity
 @Table(name="users")
-public class User {
+public class UserHelioplis {
 
     @Id
     @SequenceGenerator(name = "users_id_seq",sequenceName = "users_id_seq",allocationSize = 1)

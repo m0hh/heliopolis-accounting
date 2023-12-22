@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.helioplis.accounting.security.jwt.entity.User;
+import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import com.helioplis.accounting.security.jwt.entity.UserRequest;
 import com.helioplis.accounting.security.jwt.entity.UserResponse;
 import com.helioplis.accounting.security.jwt.service.UserService;
@@ -29,7 +29,7 @@ public class UserRestController {
     private AuthenticationManager authenticationManager;
 
     @PostMapping("/saveUser")
-    public ResponseEntity<String> saveUser(@RequestBody User user) {
+    public ResponseEntity<String> saveUser(@RequestBody UserHelioplis user) {
 
         Integer id = userService.saveUser(user);
         String message= "User with id '"+id+"' saved succssfully!";
