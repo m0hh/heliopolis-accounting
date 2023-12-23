@@ -1,20 +1,12 @@
-package com.helioplis.accounting.expense;
+package com.helioplis.accounting.credit;
 
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import com.helioplis.accounting.security.jwt.repo.UserRepository;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
-import lombok.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -23,31 +15,27 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping(value = "api/v1/expense/")
+@RequestMapping(value = "api/v1/credit/")
 @AllArgsConstructor
 @Slf4j
-public class ExpenseController {
+public class CreditController {
     @Autowired
-    private final ExpenseService expenseService;
+    private final CreditService creditService;
     private final UserRepository userRepository;
     @PostMapping("add")
-    public void addExpense(@RequestBody @Valid Expense expense,Principal principal){
+    public void addCredit(@RequestBody @Valid Credit credit, Principal principal){
         Optional<UserHelioplis> user = userRepository.findByUsername(principal.getName());
-        expense.setUser(user.get());
-        expenseService.addNewExpense(expense);
+        credit.setUser(user.get());
+        creditService.addNewCredit(credit);
     }
 
     @GetMapping("list")
-    public List<Expense> listExpenses(
+    public List<Credit> listCredits(
             @RequestParam(name = "start_date",required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start_date,
             @RequestParam(name = "end_date",required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end_date
 
     ){
 
-        return expenseService.listExpenses(start_date,end_date);
+        return creditService.listCredits(start_date,end_date);
     }
-
-
-
-
 }

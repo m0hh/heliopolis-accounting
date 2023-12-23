@@ -18,7 +18,7 @@ public class ExpenseService {
 
     List<Expense> listExpenses(LocalDateTime start_date, LocalDateTime end_date)
     {
-        return expenseRepo.findallfilter(start_date,end_date);
+        return expenseRepo.findDateBetween(start_date,end_date);
 
     }
 
