@@ -3,6 +3,7 @@ package com.helioplis.accounting.expense;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -36,7 +37,7 @@ public class Expense {
     private UserHelioplis user;
 
     @Digits(integer=10, fraction=5, message = "You must enter a number")
-    @NotNull
+    @NotNull(message = "amount cannot bel blank or null")
     @Column(name = "amount", precision = 10, scale = 2,nullable = false)
     private BigDecimal amount;
 

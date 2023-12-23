@@ -1,5 +1,6 @@
 package com.helioplis.accounting.credit;
 
+import com.helioplis.accounting.exeption.ApiRequestException;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import com.helioplis.accounting.security.jwt.repo.UserRepository;
 import jakarta.validation.Valid;
@@ -7,12 +8,15 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "api/v1/credit/")
@@ -23,10 +27,17 @@ public class CreditController {
     private final CreditService creditService;
     private final UserRepository userRepository;
     @PostMapping("add")
-    public void addCredit(@RequestBody @Valid Credit credit, Principal principal){
+    public Credit addCredit(@RequestBody @Valid Credit credit,final BindingResult bindingResult, Principal principal){
+        if (bindingResult.hasErrors()) {
+            System.out.println("DdddddddddddddDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
+            List<String> errors = bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
+            String errorMessage = String.join(", ", errors);
+            throw new ApiRequestException(errorMessage);
+        }
         Optional<UserHelioplis> user = userRepository.findByUsername(principal.getName());
         credit.setUser(user.get());
-        creditService.addNewCredit(credit);
+        Credit savedCredit =  creditService.addNewCredit(credit);
+        return savedCredit;
     }
 
     @GetMapping("list")

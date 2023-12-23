@@ -1,8 +1,10 @@
 package com.helioplis.accounting.credit;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -37,7 +39,7 @@ public class Credit {
     private UserHelioplis user;
 
     @Digits(integer=10, fraction=5, message = "You must enter a number")
-    @NotNull
+    @NotNull(message = "amount cannot bel blank or null")
     @Column(name = "amount", precision = 10, scale = 2,nullable = false)
     private BigDecimal amount;
 
@@ -47,7 +49,10 @@ public class Credit {
     @Column(name = "created_at",nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public Credit(UserHelioplis user, BigDecimal amount, String description, LocalDateTime createdAt) {
+    public Credit(UserHelioplis user,
+                  @JsonProperty("amount") BigDecimal amount,
+                  @JsonProperty("description") String description,
+                  @JsonProperty("createdAt") LocalDateTime createdAt) {
         this.user = user;
         this.amount = amount;
         this.description = description;

@@ -4,13 +4,16 @@ package com.helioplis.accounting.security.jwt.filter;
 import java.io.IOException;
 
 
+import com.helioplis.accounting.security.jwt.config.UnAuthorizedUserAuthenticationEntryPoint;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -20,36 +23,81 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.helioplis.accounting.security.jwt.util.JWTUtil;
 
+//@Component
+//public class SecurityFilter extends OncePerRequestFilter {
+//
+//    @Autowired
+//    private JWTUtil util;
+//    @Autowired
+//    private UserDetailsService userDetailsService;
+//
+//    @Override
+//    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+//            throws ServletException, IOException {
+//
+//        // Reading Token from Authorization Header
+//        String token= request.getHeader("Authorization");
+//        if(token !=null) {
+//            String username= util.getSubject(token);
+//            //if username is not null & Context Authentication must be null
+//            if(username !=null && SecurityContextHolder.getContext().getAuthentication()==null) {
+//                UserDetails user= userDetailsService.loadUserByUsername(username);
+//                boolean isValid=util.isValidToken(token, user.getUsername());
+//                if(isValid) {
+//                    UsernamePasswordAuthenticationToken authToken=
+//                            new UsernamePasswordAuthenticationToken(username, user.getPassword(), user.getAuthorities());
+//                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+//                    SecurityContextHolder.getContext().setAuthentication(authToken);
+//
+//                }
+//            }
+//        }
+//        filterChain.doFilter(request, response);
+//    }
+//
+//}
+
 @Component
 public class SecurityFilter extends OncePerRequestFilter {
 
     @Autowired
     private JWTUtil util;
+
     @Autowired
     private UserDetailsService userDetailsService;
+
+    @Autowired
+    private UnAuthorizedUserAuthenticationEntryPoint unAuthorizedUserAuthenticationEntryPoint;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
         // Reading Token from Authorization Header
-        String token= request.getHeader("Authorization");
-        if(token !=null) {
-            String username= util.getSubject(token);
-            //if username is not null & Context Authentication must be null
-            if(username !=null && SecurityContextHolder.getContext().getAuthentication()==null) {
-                UserDetails user= userDetailsService.loadUserByUsername(username);
-                boolean isValid=util.isValidToken(token, user.getUsername());
-                if(isValid) {
-                    UsernamePasswordAuthenticationToken authToken=
-                            new UsernamePasswordAuthenticationToken(username, user.getPassword(), user.getAuthorities());
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken);
+        String token = request.getHeader("Authorization");
 
+        try {
+            if (token != null) {
+                String username = util.getSubject(token);
+                //if username is not null & Context Authentication must be null
+                if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                    UserDetails user = userDetailsService.loadUserByUsername(username);
+                    boolean isValid = util.isValidToken(token, user.getUsername());
+                    if (isValid) {
+                        UsernamePasswordAuthenticationToken authToken =
+                                new UsernamePasswordAuthenticationToken(username, user.getPassword(), user.getAuthorities());
+                        authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                        SecurityContextHolder.getContext().setAuthentication(authToken);
+                    }
                 }
             }
+        } catch (Exception ex) {
+            // Catch authentication exceptions and trigger the UnAuthorizedUserAuthenticationEntryPoint
+            SecurityContextHolder.clearContext();
+            unAuthorizedUserAuthenticationEntryPoint.commence(request, response,new AuthenticationServiceException("Invalid token"));
+            return;
         }
+
         filterChain.doFilter(request, response);
     }
-
 }

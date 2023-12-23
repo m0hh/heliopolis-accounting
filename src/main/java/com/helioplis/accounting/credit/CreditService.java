@@ -13,8 +13,9 @@ import java.util.List;
 public class CreditService {
     private final CreditRepo creditRepo;
 
-    public void addNewCredit(Credit credit){
-        creditRepo.save(credit);
+    public Credit addNewCredit(Credit credit){
+
+        return creditRepo.save(credit);
     }
 
     List<Credit> listCredits(LocalDateTime start_date, LocalDateTime end_date)

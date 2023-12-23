@@ -52,9 +52,6 @@ public class SecurityConfig {
                                 .permitAll()
                                 .anyRequest()
                                 .authenticated())
-                .exceptionHandling
-                        (exeption ->
-                                exeption.authenticationEntryPoint(authenticationEntryPoint))
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(secFilter, UsernamePasswordAuthenticationFilter.class)
