@@ -1,7 +1,9 @@
 package com.helioplis.accounting.expense;
 
+import com.helioplis.accounting.exeption.ApiRequestException;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import com.helioplis.accounting.security.jwt.repo.UserRepository;
+import com.helioplis.accounting.validator.DateConstraint;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Value;
@@ -15,12 +17,16 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping(value = "api/v1/expense/")
@@ -31,19 +37,23 @@ public class ExpenseController {
     private final ExpenseService expenseService;
     private final UserRepository userRepository;
     @PostMapping("add")
-    public void addExpense(@RequestBody @Valid Expense expense,Principal principal){
+    public Expense addExpense(@RequestBody @Valid Expense expense, BindingResult bindingResult, Principal principal){
+        if (bindingResult.hasErrors()) {
+            List<String> errors = bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
+            String errorMessage = String.join(", ", errors);
+            throw new ApiRequestException(errorMessage);
+        }
         Optional<UserHelioplis> user = userRepository.findByUsername(principal.getName());
         expense.setUser(user.get());
-        expenseService.addNewExpense(expense);
+        return expenseService.addNewExpense(expense);
     }
 
     @GetMapping("list")
     public List<Expense> listExpenses(
-            @RequestParam(name = "start_date",required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start_date,
-            @RequestParam(name = "end_date",required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end_date
+            @RequestParam(name = "start_date",required = false) String start_date,
+            @RequestParam(name = "end_date",required = false) String end_date
 
     ){
-
         return expenseService.listExpenses(start_date,end_date);
     }
 

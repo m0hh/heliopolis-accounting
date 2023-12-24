@@ -29,21 +29,19 @@ public class CreditController {
     @PostMapping("add")
     public Credit addCredit(@RequestBody @Valid Credit credit,final BindingResult bindingResult, Principal principal){
         if (bindingResult.hasErrors()) {
-            System.out.println("DdddddddddddddDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
             List<String> errors = bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
             String errorMessage = String.join(", ", errors);
             throw new ApiRequestException(errorMessage);
         }
         Optional<UserHelioplis> user = userRepository.findByUsername(principal.getName());
         credit.setUser(user.get());
-        Credit savedCredit =  creditService.addNewCredit(credit);
-        return savedCredit;
+        return   creditService.addNewCredit(credit);
     }
 
     @GetMapping("list")
     public List<Credit> listCredits(
-            @RequestParam(name = "start_date",required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime start_date,
-            @RequestParam(name = "end_date",required = false) @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss") LocalDateTime end_date
+            @RequestParam(name = "start_date",required = false) String start_date,
+            @RequestParam(name = "end_date",required = false) String  end_date
 
     ){
 
