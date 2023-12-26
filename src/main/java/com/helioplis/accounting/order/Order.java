@@ -1,16 +1,19 @@
 package com.helioplis.accounting.order;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.SequenceGenerator;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "orders")
+@Data
+@NoArgsConstructor
 public class Order {
     @Id
     @SequenceGenerator(name = "order_id_seq",sequenceName = "order_id_seq",allocationSize = 1)
@@ -23,6 +26,7 @@ public class Order {
     )
     private Integer id;
 
+    @Column(name = "order_id",nullable = false)
     private Integer orderId;
 
     @Column(name = "created_at",nullable = false)
