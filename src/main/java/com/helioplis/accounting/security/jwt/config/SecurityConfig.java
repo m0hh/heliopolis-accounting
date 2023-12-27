@@ -3,6 +3,7 @@ package com.helioplis.accounting.security.jwt.config;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,6 +23,7 @@ import com.helioplis.accounting.security.jwt.filter.SecurityFilter;
 
 @EnableWebSecurity
 @Configuration
+@EnableAsync
 public class SecurityConfig {
 
     @Autowired

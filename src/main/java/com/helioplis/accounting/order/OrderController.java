@@ -35,7 +35,7 @@ public class OrderController {
         } catch (Exception e){
             throw new ApiRequestException(e.getMessage());
         }
-        String response = orderService.createFromExcel(inputStream);
-        return ResponseEntity.ok(response);
+        orderService.createFromExcel(inputStream);
+        return ResponseEntity.ok("Executed");
     }
 }
