@@ -1,8 +1,10 @@
 package com.helioplis.accounting.order;
 
+import lombok.AllArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aspectj.weaver.ast.Or;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -15,6 +17,7 @@ import java.util.*;
 
 @Service
 public class ExcelHelper {
+    private final DataFormatter dataFormatter = new DataFormatter();
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     static String[] HEADERs = { "order_id", "created", "order_total"};
     static String SHEET = "Worksheet";
@@ -39,8 +42,7 @@ public class ExcelHelper {
             List<Order> orders = new ArrayList<Order>();
 
             int rowNumber = 0;
-            boolean inData = true;
-            while (rows.hasNext() && inData) {
+            while (rows.hasNext()) {
                 Row currentRow = rows.next();
 
                 // skip header
@@ -52,38 +54,16 @@ public class ExcelHelper {
                     break;
                 }
 
-                Iterator<Cell> cellsInRow = currentRow.iterator();
 
                 Order order = new Order();
 
-                int cellIdx = 0;
-                while (cellsInRow.hasNext()) {
-                    Cell currentCell = cellsInRow.next();
-
-                    switch (cellIdx) {
-                        case 0:
-                            order.setOrderId((int) currentCell.getNumericCellValue());
-                            break;
-
-                        case 3:
-                            LocalDateTime date = LocalDateTime.parse(currentCell.getStringCellValue(), formatter);
-                            order.setCreatedAt(date);
-                            break;
-                        case 8:
-                            order.setAmount(BigDecimal.valueOf(currentCell.getNumericCellValue()));
-                            break;
-
-
-                        default:
-                            break;
-                    }
-
-                    cellIdx++;
-                }
+                order.setOrderId((int) currentRow.getCell(0).getNumericCellValue());
+                LocalDateTime date = LocalDateTime.parse(currentRow.getCell(3).getStringCellValue(), formatter);
+                order.setCreatedAt(date);
+                order.setAmount(BigDecimal.valueOf(currentRow.getCell(17).getNumericCellValue()));
                 orders.add(order);
-            }
 
-
+                }
             workbook.close();
 
             return orders;
