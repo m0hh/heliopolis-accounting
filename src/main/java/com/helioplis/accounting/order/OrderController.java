@@ -26,9 +26,14 @@ import java.util.stream.Collectors;
 public class OrderController {
 
     private  final OrderService orderService;
+    private final ExcelHelper excelHelper;
+
 
     @PostMapping("add")
     public ResponseEntity<String> addOrder(@RequestParam("file") MultipartFile file, Principal principal){
+        if (! excelHelper.hasExcelFormat(file)){
+            throw new ApiRequestException("The input file must be excel format");
+        }
         InputStream inputStream;
         try {
             inputStream =  new BufferedInputStream(file.getInputStream());

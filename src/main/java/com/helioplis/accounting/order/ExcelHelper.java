@@ -1,6 +1,8 @@
 package com.helioplis.accounting.order;
 
+import com.helioplis.accounting.exeption.ApiRequestException;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.aspectj.weaver.ast.Or;
@@ -17,6 +19,7 @@ import java.util.*;
 
 @Service
 @AllArgsConstructor
+@Slf4j
 public class ExcelHelper {
     private final DataFormatter dataFormatter;
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
@@ -34,6 +37,7 @@ public class ExcelHelper {
 
     public List<Order> excelToOrders(InputStream is) {
         try {
+            log.info("into excel");
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             Workbook workbook = new XSSFWorkbook(is);
 
@@ -57,14 +61,38 @@ public class ExcelHelper {
 
 
                 Order order = new Order();
+//                if ()
+//
+//                order.setOrderId((int) currentRow.getCell(0).getNumericCellValue());
+//                LocalDateTime date = LocalDateTime.parse(currentRow.getCell(3).getStringCellValue(), formatter);
+//                order.setCreatedAt(date);
+//                order.setAmount(BigDecimal.valueOf(currentRow.getCell(17).getNumericCellValue()));
+//                orders.add(order);
+                // Check if the cell is not empty before extracting values
+                Cell orderIdCell = currentRow.getCell(0);
+                if (orderIdCell != null && orderIdCell.getCellType() != CellType.BLANK) {
+                    order.setOrderId((int) orderIdCell.getNumericCellValue());
+                }else {
+                    log.error("order cell row " + currentRow.getRowNum() + " is empty");
+                }
+                Cell dateCell = currentRow.getCell(3);
+                if (dateCell != null && dateCell.getCellType() != CellType.BLANK) {
+                    LocalDateTime date = LocalDateTime.parse(dateCell.getStringCellValue(), formatter);
+                    order.setCreatedAt(date);
+                }else {
+                    log.error("date cell row " + currentRow.getRowNum() + " is empty");
+                }
 
-                order.setOrderId((int) currentRow.getCell(0).getNumericCellValue());
-                LocalDateTime date = LocalDateTime.parse(currentRow.getCell(3).getStringCellValue(), formatter);
-                order.setCreatedAt(date);
-                order.setAmount(BigDecimal.valueOf(currentRow.getCell(17).getNumericCellValue()));
-                orders.add(order);
+                Cell amountCell = currentRow.getCell(17);
+                if (amountCell != null && amountCell.getCellType() != CellType.BLANK) {
+                    order.setAmount(BigDecimal.valueOf(amountCell.getNumericCellValue()));
+                }else {
+                    log.error("amount cell row " + currentRow.getRowNum() + " is empty");
 
                 }
+                orders.add(order);
+
+            }
             workbook.close();
 
             return orders;

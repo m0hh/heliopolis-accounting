@@ -2,6 +2,7 @@ package com.helioplis.accounting.expense;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
+import com.helioplis.accounting.shift.Shift;
 import com.helioplis.accounting.validator.DateConstraint;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
@@ -50,10 +51,21 @@ public class Expense {
     @Column(name = "created_at",nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public Expense(UserHelioplis user, BigDecimal amount, String description, LocalDateTime createdAt) {
+    @ManyToOne()
+    @JoinColumn(
+            name = "shift_id",
+            referencedColumnName = "id",
+            foreignKey = @ForeignKey(name = "shift_id_expense_fk"),
+            nullable = false
+    )
+    @NotNull
+    private Shift shift;
+
+    public Expense(UserHelioplis user, BigDecimal amount, String description, LocalDateTime createdAt, Shift shift) {
         this.user = user;
         this.amount = amount;
         this.description = description;
         this.createdAt = createdAt;
+        this.shift = shift;
     }
 }

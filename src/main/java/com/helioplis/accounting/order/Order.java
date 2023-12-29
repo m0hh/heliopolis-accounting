@@ -1,6 +1,7 @@
 package com.helioplis.accounting.order;
 
 
+import com.helioplis.accounting.shift.Shift;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
@@ -36,4 +37,14 @@ public class Order {
     @NotNull(message = "amount cannot bel blank or null")
     @Column(name = "amount", precision = 10, scale = 2,nullable = false)
     private BigDecimal amount;
+
+    @ManyToOne()
+    @JoinColumn(
+            name = "shift_id",
+            referencedColumnName = "id",
+            foreignKey = @ForeignKey(name = "shift_id_order_fk"),
+            nullable = false
+    )
+    @NotNull
+    private Shift shift;
 }
