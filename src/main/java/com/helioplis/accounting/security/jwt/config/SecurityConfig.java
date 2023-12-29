@@ -23,7 +23,6 @@ import com.helioplis.accounting.security.jwt.filter.SecurityFilter;
 
 @EnableWebSecurity
 @Configuration
-@EnableAsync
 public class SecurityConfig {
 
     @Autowired

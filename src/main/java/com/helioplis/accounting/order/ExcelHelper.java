@@ -16,8 +16,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
+@AllArgsConstructor
 public class ExcelHelper {
-    private final DataFormatter dataFormatter = new DataFormatter();
+    private final DataFormatter dataFormatter;
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     static String[] HEADERs = { "order_id", "created", "order_total"};
     static String SHEET = "Worksheet";

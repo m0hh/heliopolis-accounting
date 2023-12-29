@@ -10,11 +10,11 @@ import java.util.List;
 
 @Service
 @AllArgsConstructor
-@Async
 public class OrderService {
     private final ExcelHelper excelHelper;
     private final OrderRepo orderRepo;
 
+    @Async
     public void createFromExcel(InputStream is){
         List<Order> orders = excelHelper.excelToOrders(is);
         orderRepo.saveAll(orders);

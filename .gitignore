@@ -32,3 +32,5 @@ build/
 ### VS Code ###
 .vscode/
 db.yml
+
+src/main/resources/heliopolis-firebase-service-account.json

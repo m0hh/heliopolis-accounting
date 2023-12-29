@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.time.format.DateTimeFormatter;
 
 @Component
-public class AppConfig {
+public class SecurityBeanConfig {
 
     @Bean
     public BCryptPasswordEncoder encodePassword() {
@@ -17,4 +17,5 @@ public class AppConfig {
     public DateTimeFormatter dateTimeFormatter() {
         return DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     }
+
 }
