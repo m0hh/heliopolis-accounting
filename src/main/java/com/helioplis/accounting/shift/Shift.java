@@ -1,5 +1,6 @@
 package com.helioplis.accounting.shift;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.helioplis.accounting.credit.Credit;
 import com.helioplis.accounting.expense.Expense;
 import com.helioplis.accounting.order.Order;
@@ -45,25 +46,28 @@ public class Shift {
     @OneToMany(
             mappedBy = "shift",
             orphanRemoval = true,
-            cascade = {CascadeType.PERSIST ,CascadeType.REMOVE},
-            fetch = FetchType.EAGER
+            cascade = {CascadeType.ALL},
+            fetch = FetchType.LAZY
     )
+    @JsonManagedReference
     private List<Expense> expenses = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "shift",
             orphanRemoval = true,
-            cascade = {CascadeType.PERSIST ,CascadeType.REMOVE},
-            fetch = FetchType.EAGER
+            cascade = {CascadeType.ALL},
+            fetch = FetchType.LAZY
     )
+    @JsonManagedReference
     private List<Credit> credits = new ArrayList<>();
 
     @OneToMany(
             mappedBy = "shift",
             orphanRemoval = true,
-            cascade = {CascadeType.PERSIST ,CascadeType.REMOVE},
-            fetch = FetchType.EAGER
+            cascade = {CascadeType.ALL},
+            fetch = FetchType.LAZY
     )
+    @JsonManagedReference
     private List<Order> orders = new ArrayList<>();
 
     @Digits(integer=10, fraction=5, message = "You must enter a number")

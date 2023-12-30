@@ -1,6 +1,7 @@
 package com.helioplis.accounting.order;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.helioplis.accounting.shift.Shift;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
@@ -38,7 +39,7 @@ public class Order {
     @Column(name = "amount", precision = 10, scale = 2,nullable = false)
     private BigDecimal amount;
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "shift_id",
             referencedColumnName = "id",
@@ -46,5 +47,7 @@ public class Order {
             nullable = false
     )
     @NotNull
+    @JsonBackReference
     private Shift shift;
+
 }

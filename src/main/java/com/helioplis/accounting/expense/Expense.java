@@ -1,6 +1,8 @@
 package com.helioplis.accounting.expense;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import com.helioplis.accounting.shift.Shift;
 import com.helioplis.accounting.validator.DateConstraint;
@@ -51,14 +53,15 @@ public class Expense {
     @Column(name = "created_at",nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "shift_id",
             referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "shift_id_expense_fk"),
             nullable = false
     )
-    @NotNull
+    @NotNull(message = "You must enter a Shift id")
+    @JsonBackReference
     private Shift shift;
 
     public Expense(UserHelioplis user, BigDecimal amount, String description, LocalDateTime createdAt, Shift shift) {
@@ -68,4 +71,5 @@ public class Expense {
         this.createdAt = createdAt;
         this.shift = shift;
     }
+
 }

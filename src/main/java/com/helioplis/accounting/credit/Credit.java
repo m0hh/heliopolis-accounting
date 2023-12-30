@@ -1,5 +1,7 @@
 package com.helioplis.accounting.credit;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import com.helioplis.accounting.shift.Shift;
@@ -50,14 +52,15 @@ public class Credit {
     @Column(name = "created_at",nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    @ManyToOne()
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "shift_id",
             referencedColumnName = "id",
             foreignKey = @ForeignKey(name = "shift_id_credit_fk"),
             nullable = false
     )
-    @NotNull
+    @NotNull(message = "You must enter a Shift id")
+    @JsonBackReference
     private Shift shift;
 
     public Credit(UserHelioplis user,
@@ -71,6 +74,7 @@ public class Credit {
         this.createdAt = createdAt;
         this.shift = shift;
     }
+
 }
 
 
