@@ -2,6 +2,8 @@ package com.helioplis.accounting.expense;
 
 
 import com.helioplis.accounting.exeption.ApiRequestException;
+import com.helioplis.accounting.shift.Shift;
+import com.helioplis.accounting.shift.ShiftRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,8 +16,11 @@ import java.util.List;
 @Service
 public class ExpenseService {
     private final ExpenseRepo expenseRepo;
+    private final ShiftRepo shiftRepo;
 
     public Expense addNewExpense(Expense expense){
+        Shift shift =  expense.getShift();
+        shiftRepo.findById(shift.getId()).orElseThrow(() -> new ApiRequestException("No Shift with that Id"));
         return expenseRepo.save(expense);
     }
 

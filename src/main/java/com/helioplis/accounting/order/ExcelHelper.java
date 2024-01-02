@@ -1,6 +1,7 @@
 package com.helioplis.accounting.order;
 
 import com.helioplis.accounting.exeption.ApiRequestException;
+import com.helioplis.accounting.shift.Shift;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
@@ -35,7 +36,7 @@ public class ExcelHelper {
         return true;
     }
 
-    public List<Order> excelToOrders(InputStream is) {
+    public List<Order> excelToOrders(InputStream is, Shift shift) {
         try {
             log.info("into excel");
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -61,14 +62,7 @@ public class ExcelHelper {
 
 
                 Order order = new Order();
-//                if ()
-//
-//                order.setOrderId((int) currentRow.getCell(0).getNumericCellValue());
-//                LocalDateTime date = LocalDateTime.parse(currentRow.getCell(3).getStringCellValue(), formatter);
-//                order.setCreatedAt(date);
-//                order.setAmount(BigDecimal.valueOf(currentRow.getCell(17).getNumericCellValue()));
-//                orders.add(order);
-                // Check if the cell is not empty before extracting values
+
                 Cell orderIdCell = currentRow.getCell(0);
                 if (orderIdCell != null && orderIdCell.getCellType() != CellType.BLANK) {
                     order.setOrderId((int) orderIdCell.getNumericCellValue());
@@ -90,6 +84,7 @@ public class ExcelHelper {
                     log.error("amount cell row " + currentRow.getRowNum() + " is empty");
 
                 }
+                order.setShift(shift);
                 orders.add(order);
 
             }

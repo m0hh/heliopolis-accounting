@@ -3,6 +3,8 @@ package com.helioplis.accounting.credit;
 import com.helioplis.accounting.exeption.ApiRequestException;
 import com.helioplis.accounting.expense.Expense;
 import com.helioplis.accounting.expense.ExpenseRepo;
+import com.helioplis.accounting.shift.Shift;
+import com.helioplis.accounting.shift.ShiftRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,9 +17,11 @@ import java.util.List;
 @Service
 public class CreditService {
     private final CreditRepo creditRepo;
+    private final ShiftRepo shiftRepo;
 
     public Credit addNewCredit(Credit credit){
-
+        Shift shift =  credit.getShift();
+        shiftRepo.findById(shift.getId()).orElseThrow(() -> new ApiRequestException("No Shift with that Id"));
         return creditRepo.save(credit);
     }
 
