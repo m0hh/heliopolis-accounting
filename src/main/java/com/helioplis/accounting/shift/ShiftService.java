@@ -1,9 +1,13 @@
 package com.helioplis.accounting.shift;
 
 import com.helioplis.accounting.exeption.ApiRequestException;
+import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
+import com.helioplis.accounting.security.jwt.repo.UserRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,6 +15,7 @@ import java.util.stream.Collectors;
 @Service
 public class ShiftService {
     private final ShiftRepo shiftRepo;
+    private final UserRepository userRepository;
 
     public Shift addNewShift(Shift shift){
         if (shiftRepo.findOpenShift()){
@@ -35,5 +40,14 @@ public class ShiftService {
         dto.setCreatedAt(shift.getCreatedAt());
         dto.setClosed_at(shift.getClosed_at());
         return dto;
+    }
+    @Transactional
+    public Integer closeShift(Integer shiftId, Principal principal){
+        Shift shift = shiftRepo.findById(shiftId).orElseThrow(() -> new ApiRequestException("No shift is by that id"));
+        if (shift.getClosed_at() != null){
+            throw new ApiRequestException("This Shift is closed modify it first");
+        }
+        UserHelioplis user = userRepository.findByUsername(principal.getName()).get();
+        return shiftRepo.closeShift(shift.getId(), user.getId());
     }
 }
