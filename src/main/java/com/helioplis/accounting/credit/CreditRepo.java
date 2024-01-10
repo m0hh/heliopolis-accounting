@@ -11,6 +11,6 @@ import java.util.List;
 
 @Repository
 public interface CreditRepo extends JpaRepository<Credit,Integer> {
-    @Query(value = "SELECT * FROM credits WHERE (cast(:beforeDate as timestamp without time zone) IS NULL OR created_at >= :beforeDate) AND (cast(:afterDate as timestamp without time zone) IS NULL OR created_at <= :afterDate)", nativeQuery = true)
-    List<Credit> findDateBetween(@Param("beforeDate") LocalDateTime beforeDate, @Param("afterDate") LocalDateTime afterDate);
+    @Query(value = "SELECT * FROM credits WHERE (cast(:beforeDate as timestamp without time zone) IS NULL OR created_at >= :beforeDate) AND (cast(:afterDate as timestamp without time zone) IS NULL OR created_at <= :afterDate) AND (cast(:shiftId as INTEGER) IS NULL OR shift_id = :shiftId)", nativeQuery = true)
+    List<Credit> findFilter(@Param("beforeDate") LocalDateTime beforeDate, @Param("afterDate") LocalDateTime afterDate, @Param("shiftId") Integer shiftId);
 }

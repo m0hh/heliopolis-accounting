@@ -11,6 +11,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -19,11 +20,14 @@ import java.util.List;
 public class OrderService {
     private final ExcelHelper excelHelper;
     private final OrderRepo orderRepo;
-    private final ShiftRepo shiftRepo;
 
     @Async
     public void createFromExcel(InputStream is, Shift shift){
         List<Order> orders = excelHelper.excelToOrders(is, shift);
         orderRepo.saveAll(orders);
+    }
+
+    public List<Order> listOrdersfilter(LocalDateTime beforeDate, LocalDateTime afterDate, Integer shiftId){
+        return orderRepo.findFilter(beforeDate, afterDate, shiftId);
     }
 }

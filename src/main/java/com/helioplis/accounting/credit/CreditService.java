@@ -25,7 +25,7 @@ public class CreditService {
         return creditRepo.save(credit);
     }
 
-    List<Credit> listCredits(String s_date, String e_date)
+    List<Credit> listCredits(String s_date, String e_date, Integer shiftId)
     {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         LocalDateTime start_date = null;
@@ -40,7 +40,7 @@ public class CreditService {
         } catch (DateTimeParseException e){
             throw new ApiRequestException("Wrong date format, the correct format is yyyy-MM-ddTHH:mm:ss", e);
         }
-        return creditRepo.findDateBetween(start_date,end_date);
+        return creditRepo.findFilter(start_date,end_date, shiftId);
 
     }
 }

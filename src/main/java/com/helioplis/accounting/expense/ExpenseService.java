@@ -24,7 +24,7 @@ public class ExpenseService {
         return expenseRepo.save(expense);
     }
 
-    List<Expense> listExpenses(String s_date, String e_date)
+    List<Expense> listExpenses(String s_date, String e_date,Integer shiftId)
     {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         LocalDateTime start_date = null;
@@ -39,7 +39,7 @@ public class ExpenseService {
         } catch (DateTimeParseException e){
             throw new ApiRequestException("Wrong date format, the correct format is yyyy-MM-ddTHH:mm:ss", e);
         }
-        return expenseRepo.findDateBetween(start_date,end_date);
+        return expenseRepo.findFilter(start_date,end_date,shiftId);
 
     }
 

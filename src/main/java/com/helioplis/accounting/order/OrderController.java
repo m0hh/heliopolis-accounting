@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -56,5 +57,16 @@ public class OrderController {
         }
         orderService.createFromExcel(inputStream, shift);
         return ResponseEntity.ok("Executed");
+    }
+
+    @GetMapping("list")
+    public List<Order> listOrders(
+            @RequestParam(name = "start_date",required = false) LocalDateTime start_date,
+            @RequestParam(name = "end_date",required = false) LocalDateTime end_date,
+            @RequestParam(name = "shift_id", required = false) Integer shiftId
+
+
+    ){
+        return orderService.listOrdersfilter(start_date,end_date,shiftId);
     }
 }

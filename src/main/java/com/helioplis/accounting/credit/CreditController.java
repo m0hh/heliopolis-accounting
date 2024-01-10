@@ -42,10 +42,11 @@ public class CreditController {
     @GetMapping("list")
     public List<Credit> listCredits(
             @RequestParam(name = "start_date",required = false) String start_date,
-            @RequestParam(name = "end_date",required = false) String  end_date
+            @RequestParam(name = "end_date",required = false) String  end_date,
+            @RequestParam(name = "shift_id", required = false) Integer shiftId
 
     ){
 
-        return creditService.listCredits(start_date,end_date);
+        return creditService.listCredits(start_date,end_date, shiftId);
     }
 }
