@@ -35,23 +35,15 @@ public class ShiftController {
         return shiftService.shiftList();
     }
 
-    @PostMapping("close")
-    Integer closeShift(@RequestBody @Valid ShiftCloseRequestDTO shiftCloseRequestDTO, BindingResult bindingResult, Principal principal){
-        if (bindingResult.hasErrors()) {
-            List<String> errors = bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
-            String errorMessage = String.join(", ", errors);
-            throw new ApiRequestException(errorMessage);
-        }
-        return shiftService.closeShift(shiftCloseRequestDTO.getShiftId(), principal);
+    @PostMapping("close/{shiftId}")
+    Integer closeShift(@PathVariable Integer shiftId, BindingResult bindingResult, Principal principal){
+
+        return shiftService.closeShift(shiftId, principal);
     }
 
-    @PutMapping("reopen")
-    Shift reopenShift(@RequestBody @Valid ShiftCloseRequestDTO shiftReopen, BindingResult bindingResult, Principal principal){
-        if (bindingResult.hasErrors()) {
-            List<String> errors = bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
-            String errorMessage = String.join(", ", errors);
-            throw new ApiRequestException(errorMessage);
-        }
-        return shiftService.reopen(shiftReopen.getShiftId(), principal);
+    @PutMapping("reopen/{shiftId}")
+    Shift reopenShift(@PathVariable Integer shiftId, Principal principal){
+
+        return shiftService.reopen(shiftId, principal);
     }
 }
