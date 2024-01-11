@@ -50,4 +50,17 @@ public class ShiftService {
         UserHelioplis user = userRepository.findByUsername(principal.getName()).get();
         return shiftRepo.closeShift(shift.getId(), user.getId());
     }
+
+    public Shift reopen(Integer shidtId, Principal principal){
+        if (shiftRepo.findOpenShift()){
+            throw new ApiRequestException("There is an open shift you need to close that first");
+        }
+        Shift shift = shiftRepo.findById(shidtId).orElseThrow(()-> new ApiRequestException("There is no shift by that ID"));
+        UserHelioplis user = userRepository.findByUsername(principal.getName()).get();
+        if (shift.getUserOpen().getId() != user.getId()){
+            throw new ApiRequestException("The user who opened the shift must reopen it");
+        }
+        shift.setClosed_at(null);
+        return shiftRepo.save(shift);
+    }
 }

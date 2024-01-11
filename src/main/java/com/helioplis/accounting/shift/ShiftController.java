@@ -44,4 +44,14 @@ public class ShiftController {
         }
         return shiftService.closeShift(shiftCloseRequestDTO.getShiftId(), principal);
     }
+
+    @PutMapping("reopen")
+    Shift reopenShift(@RequestBody @Valid ShiftCloseRequestDTO shiftReopen, BindingResult bindingResult, Principal principal){
+        if (bindingResult.hasErrors()) {
+            List<String> errors = bindingResult.getAllErrors().stream().map(e -> e.getDefaultMessage()).collect(Collectors.toList());
+            String errorMessage = String.join(", ", errors);
+            throw new ApiRequestException(errorMessage);
+        }
+        return shiftService.reopen(shiftReopen.getShiftId(), principal);
+    }
 }
