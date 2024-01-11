@@ -66,4 +66,9 @@ public class CreditService {
 
         return creditRepo.save(myCredit);
     }
+
+    public Credit retrieveCredit(Integer creditId){
+        Credit credit = creditRepo.findById(creditId).orElseThrow(()-> new ApiRequestException("No Credit with that ID"));
+        return credit;
+    }
 }

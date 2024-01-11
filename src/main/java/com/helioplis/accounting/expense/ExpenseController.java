@@ -67,6 +67,11 @@ public class ExpenseController {
         return   expenseService.updateExpense(dto, user.get().getId());
     }
 
+    @GetMapping("retrieve/{expenseId}")
+    public Expense retrieveExpense(@PathVariable Integer expenseId, Principal principal){
+        return expenseService.retrieveExpense(expenseId);
+    }
+
 
 
 

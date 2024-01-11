@@ -2,6 +2,7 @@ package com.helioplis.accounting.security.jwt.entity;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import lombok.Data;
@@ -23,6 +24,7 @@ public class UserHelioplis {
     private String username;
 
     @Column(name="user_passwd")
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(name="user_email")

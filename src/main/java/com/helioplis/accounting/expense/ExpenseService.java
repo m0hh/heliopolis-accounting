@@ -65,4 +65,8 @@ public class ExpenseService {
         return expenseRepo.save(myExpense);
     }
 
+    public Expense retrieveExpense(Integer expenseId){
+        return expenseRepo.findById(expenseId).orElseThrow(() -> new ApiRequestException("No Expense with that ID"));
+    }
+
 }

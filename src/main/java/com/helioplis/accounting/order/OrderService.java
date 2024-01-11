@@ -50,4 +50,9 @@ public class OrderService {
 
         return orderRepo.save(myOrder);
     }
+
+    public Order retrieveOrder(Integer orderId){
+        return orderRepo.findById(orderId).orElseThrow(()-> new ApiRequestException("No Order with that Id"));
+    }
 }
+

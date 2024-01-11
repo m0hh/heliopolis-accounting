@@ -75,4 +75,9 @@ public class OrderController {
     public Order updateOrder(@RequestBody OrderUpdateDTO dto, Principal principal){
         return   orderService.updateOrder(dto);
     }
+
+    @GetMapping("retrieve/{orderId}")
+    public Order retrieveOrder(@PathVariable Integer orderId, Principal principal){
+        return  orderService.retrieveOrder(orderId);
+    }
 }
