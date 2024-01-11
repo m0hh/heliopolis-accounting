@@ -2,6 +2,7 @@ package com.helioplis.accounting.order;
 
 import com.helioplis.accounting.exeption.ApiRequestException;
 import com.helioplis.accounting.expense.Expense;
+import com.helioplis.accounting.expense.ExpenseUpdateDTO;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import com.helioplis.accounting.shift.Shift;
 import com.helioplis.accounting.shift.ShiftRepo;
@@ -68,5 +69,10 @@ public class OrderController {
 
     ){
         return orderService.listOrdersfilter(start_date,end_date,shiftId);
+    }
+
+    @PutMapping("update")
+    public Order updateOrder(@RequestBody OrderUpdateDTO dto, Principal principal){
+        return   orderService.updateOrder(dto);
     }
 }

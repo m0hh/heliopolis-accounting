@@ -1,5 +1,7 @@
 package com.helioplis.accounting.expense;
 
+import com.helioplis.accounting.credit.Credit;
+import com.helioplis.accounting.credit.CreditUpdateDTO;
 import com.helioplis.accounting.exeption.ApiRequestException;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import com.helioplis.accounting.security.jwt.repo.UserRepository;
@@ -57,6 +59,12 @@ public class ExpenseController {
 
     ){
         return expenseService.listExpenses(start_date,end_date,shiftId);
+    }
+
+    @PutMapping("update")
+    public Expense updateExpense(@RequestBody ExpenseUpdateDTO dto, Principal principal){
+        Optional<UserHelioplis> user = userRepository.findByUsername(principal.getName());
+        return   expenseService.updateExpense(dto, user.get().getId());
     }
 
 

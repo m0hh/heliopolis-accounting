@@ -49,4 +49,9 @@ public class CreditController {
 
         return creditService.listCredits(start_date,end_date, shiftId);
     }
+    @PutMapping("update")
+    public Credit updateCredit(@RequestBody  CreditUpdateDTO dto, Principal principal){
+        Optional<UserHelioplis> user = userRepository.findByUsername(principal.getName());
+        return   creditService.updateCredit(dto, user.get().getId());
+    }
 }

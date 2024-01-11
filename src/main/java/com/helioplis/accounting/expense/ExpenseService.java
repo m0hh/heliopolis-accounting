@@ -1,10 +1,13 @@
 package com.helioplis.accounting.expense;
 
 
+import com.helioplis.accounting.credit.Credit;
+import com.helioplis.accounting.credit.CreditUpdateDTO;
 import com.helioplis.accounting.exeption.ApiRequestException;
 import com.helioplis.accounting.shift.Shift;
 import com.helioplis.accounting.shift.ShiftRepo;
 import lombok.AllArgsConstructor;
+import org.apache.commons.math3.analysis.function.Exp;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -17,6 +20,7 @@ import java.util.List;
 public class ExpenseService {
     private final ExpenseRepo expenseRepo;
     private final ShiftRepo shiftRepo;
+    private final  ExpenseMapper mapper;
 
     public Expense addNewExpense(Expense expense){
         Shift shift =  expense.getShift();
@@ -43,5 +47,22 @@ public class ExpenseService {
 
     }
 
+    public Expense updateExpense(ExpenseUpdateDTO dto, Integer userId) {
+        Expense myExpense = expenseRepo.findById(dto.getId()).orElseThrow(() -> new ApiRequestException("No Expense with that ID"));
+        if (myExpense.getUser().getId() != userId){
+            throw  new ApiRequestException("Only the user who created the expense can modify it");
+        }
+        if (dto.getShift() != null){
+            Integer shiftId = dto.getShift().getId();
+            Shift shift = shiftRepo.findById(shiftId).orElseThrow(()-> new ApiRequestException("No Shift by that ID"));
+            if (shift.getClosed_at() != null){
+                throw new ApiRequestException("This Shift is closed open it first and then modify");
+            }
+
+        }
+        mapper.updateExpenseFromDto(dto, myExpense);
+
+        return expenseRepo.save(myExpense);
+    }
 
 }

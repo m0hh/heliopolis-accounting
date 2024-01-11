@@ -1,6 +1,8 @@
 package com.helioplis.accounting.order;
 
 import com.helioplis.accounting.exeption.ApiRequestException;
+import com.helioplis.accounting.expense.Expense;
+import com.helioplis.accounting.expense.ExpenseUpdateDTO;
 import com.helioplis.accounting.shift.Shift;
 import com.helioplis.accounting.shift.ShiftRepo;
 import com.helioplis.accounting.shift.ShiftService;
@@ -20,6 +22,8 @@ import java.util.List;
 public class OrderService {
     private final ExcelHelper excelHelper;
     private final OrderRepo orderRepo;
+    private final ShiftRepo shiftRepo;
+    private final OrderMapper mapper;
 
     @Async
     public void createFromExcel(InputStream is, Shift shift){
@@ -29,5 +33,21 @@ public class OrderService {
 
     public List<Order> listOrdersfilter(LocalDateTime beforeDate, LocalDateTime afterDate, Integer shiftId){
         return orderRepo.findFilter(beforeDate, afterDate, shiftId);
+    }
+
+    public Order updateOrder(OrderUpdateDTO dto) {
+        Order myOrder = orderRepo.findById(dto.getId()).orElseThrow(() -> new ApiRequestException("No Order with that ID"));
+
+        if (dto.getShift() != null){
+            Integer shiftId = dto.getShift().getId();
+            Shift shift = shiftRepo.findById(shiftId).orElseThrow(()-> new ApiRequestException("No Shift by that ID"));
+            if (shift.getClosed_at() != null){
+                throw new ApiRequestException("This Shift is closed open it first and then modify");
+            }
+
+        }
+        mapper.updateOrderFromDto(dto, myOrder);
+
+        return orderRepo.save(myOrder);
     }
 }

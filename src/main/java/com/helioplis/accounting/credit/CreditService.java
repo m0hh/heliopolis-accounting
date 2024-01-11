@@ -3,6 +3,7 @@ package com.helioplis.accounting.credit;
 import com.helioplis.accounting.exeption.ApiRequestException;
 import com.helioplis.accounting.expense.Expense;
 import com.helioplis.accounting.expense.ExpenseRepo;
+import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import com.helioplis.accounting.shift.Shift;
 import com.helioplis.accounting.shift.ShiftRepo;
 import lombok.AllArgsConstructor;
@@ -18,10 +19,14 @@ import java.util.List;
 public class CreditService {
     private final CreditRepo creditRepo;
     private final ShiftRepo shiftRepo;
+    private final CreditMapper mapper;
 
     public Credit addNewCredit(Credit credit){
-        Shift shift =  credit.getShift();
-        shiftRepo.findById(shift.getId()).orElseThrow(() -> new ApiRequestException("No Shift with that Id"));
+
+        Shift shift = shiftRepo.findById(credit.getShift().getId()).orElseThrow(() -> new ApiRequestException("No Shift with that Id"));
+        if (shift.getClosed_at() != null){
+            throw new ApiRequestException("This Shift is closed open it first and then modify");
+        }
         return creditRepo.save(credit);
     }
 
@@ -42,5 +47,23 @@ public class CreditService {
         }
         return creditRepo.findFilter(start_date,end_date, shiftId);
 
+    }
+
+    public Credit updateCredit(CreditUpdateDTO dto, Integer userId) {
+        Credit myCredit = creditRepo.findById(dto.getId()).orElseThrow(() -> new ApiRequestException("No Credit with that ID"));
+        if (myCredit.getUser().getId() != userId){
+            throw  new ApiRequestException("Only the user who created the credit can modify it");
+        }
+        if (dto.getShift() != null){
+            Integer shiftId = dto.getShift().getId();
+            Shift shift = shiftRepo.findById(shiftId).orElseThrow(()-> new ApiRequestException("No Shift by that ID"));
+            if (shift.getClosed_at() != null){
+                throw new ApiRequestException("This Shift is closed open it first and then modify");
+            }
+
+        }
+        mapper.updateCreditFromDto(dto, myCredit);
+
+        return creditRepo.save(myCredit);
     }
 }
