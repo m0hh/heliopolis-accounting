@@ -72,6 +72,12 @@ public class ExpenseController {
         return expenseService.retrieveExpense(expenseId);
     }
 
+    @DeleteMapping("delete/{expenseId}")
+    public ResponseEntity<Void> deleteCredit(@PathVariable Integer expenseId, Principal principal){
+        expenseService.deleteCredit(expenseId, principal);
+        return ResponseEntity.noContent().build();
+    }
+
 
 
 

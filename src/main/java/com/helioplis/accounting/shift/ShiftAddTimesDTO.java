@@ -4,10 +4,12 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
-public class ShiftCloseRequestDTO {
-    @NotNull
-    private Integer shiftId;
+public class ShiftAddTimesDTO {
+    private LocalDateTime createdAt;
+    private LocalDateTime   closedAt;
 
 }

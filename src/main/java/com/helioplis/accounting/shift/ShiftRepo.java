@@ -7,11 +7,17 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ShiftRepo extends JpaRepository<Shift,Integer> {
     @Query(value = "SELECT EXISTS( SELECT 1 FROM shifts WHERE closed_at IS NULL)", nativeQuery = true)
     Boolean findOpenShift();
+
+    @Query(value = "SELECT EXISTS( SELECT 1 FROM shifts WHERE closed_at IS NULL) OR " +
+            "EXISTS (SELECT 1 FROM shifts WHERE (created_at <= :startTime    AND  closed_at > :startTime)  OR (cast(:endTime as timestamp without time zone) IS NULL OR created_at <= :endTime AND :endTime < closed_at))"
+            , nativeQuery = true)
+    Boolean findOpenOrOverlappingShift(@Param("startTime") LocalDateTime startTime, LocalDateTime endTime);
 
     @Modifying
     @Query(value ="UPDATE shifts "+

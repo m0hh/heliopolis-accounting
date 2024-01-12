@@ -7,8 +7,11 @@ import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import com.helioplis.accounting.shift.Shift;
 import com.helioplis.accounting.shift.ShiftRepo;
 import lombok.AllArgsConstructor;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -70,5 +73,16 @@ public class CreditService {
     public Credit retrieveCredit(Integer creditId){
         Credit credit = creditRepo.findById(creditId).orElseThrow(()-> new ApiRequestException("No Credit with that ID"));
         return credit;
+    }
+
+    @Transactional
+    public void deleteCredit(Integer creditId, Principal principal){
+
+        Credit credit = creditRepo.findById(creditId).orElseThrow(()-> new ApiRequestException("No credit with that ID"));
+
+        if (!credit.getUser().getUsername().equals(principal.getName())){
+            throw new ApiRequestException("Only the user who created the credit can delete it");
+        }
+        creditRepo.delete(credit);
     }
 }

@@ -23,10 +23,18 @@ public class ShiftController {
     private final ShiftService shiftService;
     private final UserRepository userRepository;
     @PostMapping("add")
-    public Shift addShift(Principal principal){
+    public Shift addShift(@RequestBody(required = false) ShiftAddTimesDTO shiftAddTimesDTO,Principal principal){
         Optional<UserHelioplis> user = userRepository.findByUsername(principal.getName());
         Shift shift = new Shift();
         shift.setUserOpen(user.get());
+        if (shiftAddTimesDTO != null) {
+            if (shiftAddTimesDTO.getCreatedAt() != null) {
+                shift.setCreatedAt(shiftAddTimesDTO.getCreatedAt());
+            }
+            if (shiftAddTimesDTO.getClosedAt() != null) {
+                shift.setClosed_at(shiftAddTimesDTO.getClosedAt());
+            }
+        }
         return shiftService.addNewShift(shift);
     }
 
@@ -36,7 +44,7 @@ public class ShiftController {
     }
 
     @PostMapping("close/{shiftId}")
-    Integer closeShift(@PathVariable Integer shiftId, BindingResult bindingResult, Principal principal){
+    Integer closeShift(@PathVariable Integer shiftId, Principal principal){
 
         return shiftService.closeShift(shiftId, principal);
     }

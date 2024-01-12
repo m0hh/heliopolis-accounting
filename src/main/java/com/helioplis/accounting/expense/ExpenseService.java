@@ -9,7 +9,9 @@ import com.helioplis.accounting.shift.ShiftRepo;
 import lombok.AllArgsConstructor;
 import org.apache.commons.math3.analysis.function.Exp;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.security.Principal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -67,6 +69,16 @@ public class ExpenseService {
 
     public Expense retrieveExpense(Integer expenseId){
         return expenseRepo.findById(expenseId).orElseThrow(() -> new ApiRequestException("No Expense with that ID"));
+    }
+
+    @Transactional
+    public void deleteCredit(Integer expenseId, Principal principal){
+        Expense expense = expenseRepo.findById(expenseId).orElseThrow(()-> new ApiRequestException("No expense with that ID"));
+
+        if (!expense.getUser().getUsername().equals(principal.getName())){
+            throw new ApiRequestException("Only the user who created the expense can delete it");
+        }
+        expenseRepo.delete(expense);
     }
 
 }

@@ -18,8 +18,9 @@ public class ShiftService {
     private final UserRepository userRepository;
 
     public Shift addNewShift(Shift shift){
-        if (shiftRepo.findOpenShift()){
-            throw new ApiRequestException("There is an open shift you need to close that first");
+        if (shiftRepo.findOpenOrOverlappingShift(shift.getCreatedAt(), shift.getClosed_at())){
+            System.out.println(shift.getCreatedAt());
+            throw new ApiRequestException("There is an open shift or an overlapping shift, you need to close the open shift or modify the dates if overlapping");
         }
         return shiftRepo.save(shift);
     }
