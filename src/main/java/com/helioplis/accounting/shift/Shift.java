@@ -1,9 +1,11 @@
 package com.helioplis.accounting.shift;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.helioplis.accounting.credit.Credit;
 import com.helioplis.accounting.expense.Expense;
 import com.helioplis.accounting.order.Order;
+import com.helioplis.accounting.pay.Pay;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
@@ -45,7 +47,7 @@ public class Shift {
     private UserHelioplis userClose;
     @OneToMany(
             mappedBy = "shift",
-            orphanRemoval = true,
+            orphanRemoval = false,
             cascade = {CascadeType.ALL},
             fetch = FetchType.LAZY
     )
@@ -54,7 +56,7 @@ public class Shift {
 
     @OneToMany(
             mappedBy = "shift",
-            orphanRemoval = true,
+            orphanRemoval = false,
             cascade = {CascadeType.ALL},
             fetch = FetchType.LAZY
     )
@@ -63,7 +65,7 @@ public class Shift {
 
     @OneToMany(
             mappedBy = "shift",
-            orphanRemoval = true,
+            orphanRemoval = false,
             cascade = {CascadeType.ALL},
             fetch = FetchType.LAZY
     )
@@ -91,6 +93,16 @@ public class Shift {
 
     @Column(name = "closed_at",nullable = true)
     private LocalDateTime closed_at;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(
+            name = "pay_id",
+            referencedColumnName = "id",
+            foreignKey = @ForeignKey(name = "fk_pay_id"),
+            nullable = true
+    )
+    @JsonBackReference
+    private Pay pay;
 
 
 
