@@ -15,7 +15,8 @@ public interface ShiftRepo extends JpaRepository<Shift,Integer> {
     Boolean findOpenShift();
 
     @Query(value = "SELECT EXISTS( SELECT 1 FROM shifts WHERE closed_at IS NULL) OR " +
-            "EXISTS (SELECT 1 FROM shifts WHERE (created_at <= :startTime    AND  closed_at > :startTime)  OR (cast(:endTime as timestamp without time zone) IS NULL OR created_at <= :endTime AND :endTime < closed_at))"
+            "EXISTS (SELECT 1 FROM shifts WHERE (created_at <= :startTime    AND  closed_at > :startTime)" +
+            "  OR (cast(:endTime as timestamp without time zone) IS NULL OR created_at <= :endTime AND :endTime < closed_at))"
             , nativeQuery = true)
     Boolean findOpenOrOverlappingShift(@Param("startTime") LocalDateTime startTime, LocalDateTime endTime);
 

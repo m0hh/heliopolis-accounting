@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import jdk.dynalink.linker.LinkerServices;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -53,5 +54,11 @@ public class ShiftController {
     Shift reopenShift(@PathVariable Integer shiftId, Principal principal){
 
         return shiftService.reopen(shiftId, principal);
+    }
+
+    @DeleteMapping("delete/{shiftId}")
+    ResponseEntity<Void> deleteShift(@PathVariable Integer shiftId, Principal principal){
+        shiftService.deleteShift(shiftId, principal);
+        return ResponseEntity.noContent().build();
     }
 }

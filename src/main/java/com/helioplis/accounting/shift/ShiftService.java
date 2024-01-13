@@ -64,4 +64,13 @@ public class ShiftService {
         shift.setClosed_at(null);
         return shiftRepo.save(shift);
     }
+
+    public void deleteShift(Integer shiftId, Principal principal){
+        Shift shift = shiftRepo.findById(shiftId).orElseThrow(() -> new ApiRequestException("No shift with that ID"));
+        if (! shift.getUserOpen().getUsername().equals(principal.getName())){
+            throw new ApiRequestException("Only the user who created the shift can delete it");
+        }
+        shiftRepo.delete(shift);
+    }
+
 }
