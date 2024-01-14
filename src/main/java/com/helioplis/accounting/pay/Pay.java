@@ -1,11 +1,13 @@
 package com.helioplis.accounting.pay;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.helioplis.accounting.expense.Expense;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import com.helioplis.accounting.shift.Shift;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -22,13 +24,13 @@ public class Pay {
     private Integer id;
 
     @Column(name = "total_hours", precision = 5, scale = 5,nullable = true)
-    private Integer totalHours;
+    private BigDecimal totalHours;
 
     @Column(name = "total_pay", precision = 5, scale = 5,nullable = true)
-    private Integer totalPay;
+    private BigDecimal totalPay;
 
     @Column(name = "total_deduction", precision = 5, scale = 5,nullable = true)
-    private Integer totalDeduction;
+    private BigDecimal totalDeduction;
 
     @Column(name = "created_at", nullable = false)
     private LocalDate createdAt;
@@ -51,4 +53,18 @@ public class Pay {
     )
     @JsonManagedReference
     private List<Shift> shifts = new ArrayList<>();
+
+    public void addShift(Shift shift){
+        if (!this.shifts.contains(shift)){
+            this.shifts.add(shift);
+            shift.setPay(this);
+        }
+    }
+
+    public void removeShift(Shift shift){
+        if(this.shifts.contains(shift)){
+            this.shifts.remove(shift);
+            shift.setPay(null);
+        }
+    }
 }

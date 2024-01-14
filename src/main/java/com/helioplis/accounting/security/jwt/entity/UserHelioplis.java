@@ -1,10 +1,12 @@
 package com.helioplis.accounting.security.jwt.entity;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
 @Data
@@ -20,15 +22,21 @@ public class UserHelioplis {
     @Column(name="id")
     private Integer id;
 
+    @NotNull
     @Column(name="user_name")
     private String username;
 
+    @NotNull
     @Column(name="user_passwd")
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     @Column(name="user_email")
     private String email;
+
+    @NotNull
+    @Column(name="hourly_rate", precision = 5,scale = 5, nullable = false)
+    private BigDecimal hourlyRate;
 
     @ElementCollection(fetch= FetchType.EAGER)
     @CollectionTable(

@@ -1,0 +1,1 @@
+ALTER TABLE users ALTER COLUMN hourly_rate SET NOT NULL;

@@ -1,5 +1,6 @@
 package com.helioplis.accounting.shift;
 
+import com.helioplis.accounting.expense.Expense;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import jakarta.persistence.SqlResultSetMapping;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -38,4 +39,9 @@ public interface ShiftRepo extends JpaRepository<Shift,Integer> {
             "WHERE shifts.id = :shiftId "
             , nativeQuery = true)
     Integer closeShift(@Param("shiftId") Integer shiftId, @Param("userId") Integer userId);
+
+    @Query(value = "SELECT * FROM shifts WHERE (cast(:beforeDate as timestamp without time zone) IS NULL OR created_at >= :beforeDate)" +
+            " AND (cast(:afterDate as timestamp without time zone) IS NULL OR created_at <= :afterDate)" +
+            " AND (cast(:userId as INTEGER) IS NULL OR user_id_opened = :userId)", nativeQuery = true)
+    List<Shift> findFilter(@Param("beforeDate") LocalDateTime beforeDate, @Param("afterDate") LocalDateTime afterDate, @Param("userId") Integer userId);
 }
