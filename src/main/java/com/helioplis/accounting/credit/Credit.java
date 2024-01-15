@@ -31,7 +31,7 @@ public class Credit {
             updatable = false
     )
     private Integer id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(
             name = "user_id",
             referencedColumnName = "id",
@@ -75,6 +75,9 @@ public class Credit {
         this.shift = shift;
     }
 
+    public String getUser() {
+        return user.getUsername();
+    }
 }
 
 

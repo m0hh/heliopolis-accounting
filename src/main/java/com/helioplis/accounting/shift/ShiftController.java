@@ -8,6 +8,7 @@ import jdk.dynalink.linker.LinkerServices;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -33,7 +34,9 @@ public class ShiftController {
                 shift.setCreatedAt(shiftAddTimesDTO.getCreatedAt());
             }
             if (shiftAddTimesDTO.getClosedAt() != null) {
+                System.out.println(shiftAddTimesDTO.getClosedAt());
                 shift.setClosed_at(shiftAddTimesDTO.getClosedAt());
+                shift.setClosed(true);
             }
         }
         return shiftService.addNewShift(shift);
@@ -56,9 +59,5 @@ public class ShiftController {
         return shiftService.reopen(shiftId, principal);
     }
 
-    @DeleteMapping("delete/{shiftId}")
-    ResponseEntity<Void> deleteShift(@PathVariable Integer shiftId, Principal principal){
-        shiftService.deleteShift(shiftId, principal);
-        return ResponseEntity.noContent().build();
-    }
+
 }

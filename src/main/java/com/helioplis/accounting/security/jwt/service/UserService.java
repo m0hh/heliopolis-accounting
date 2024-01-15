@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import com.helioplis.accounting.exeption.ApiRequestException;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -31,6 +32,13 @@ public class UserService implements  UserDetailsService{
         //Encode password before saving to DB
         user.setPassword(bCryptEncoder.encode(user.getPassword()));
         return userRepo.save(user).getId();
+    }
+
+    public String addFirebaseToken(String username, String firebaseToken){
+        UserHelioplis user = userRepo.findByUsername(username).orElseThrow(()-> new ApiRequestException("No user found with that username"));
+        user.setFirbaseToken(firebaseToken);
+        userRepo.save(user);
+        return "Saved";
     }
 
     //find user by username

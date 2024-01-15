@@ -12,14 +12,13 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ShiftRepo extends JpaRepository<Shift,Integer> {
-    @Query(value = "SELECT EXISTS( SELECT 1 FROM shifts WHERE closed_at IS NULL)", nativeQuery = true)
+    @Query(value = "SELECT EXISTS( SELECT 1 FROM shifts WHERE closed IS FALSE)", nativeQuery = true)
     Boolean findOpenShift();
 
-    @Query(value = "SELECT EXISTS( SELECT 1 FROM shifts WHERE closed_at IS NULL) OR " +
-            "EXISTS (SELECT 1 FROM shifts WHERE (created_at <= :startTime    AND  closed_at > :startTime)" +
-            "  OR (cast(:endTime as timestamp without time zone) IS NULL OR created_at <= :endTime AND :endTime < closed_at))"
+    @Query(value = "SELECT EXISTS( SELECT 1 FROM shifts WHERE closed IS FALSE) OR " +
+            "EXISTS (SELECT 1 FROM shifts WHERE (created_at <= :startTime    AND  closed_at > :startTime))"
             , nativeQuery = true)
-    Boolean findOpenOrOverlappingShift(@Param("startTime") LocalDateTime startTime, LocalDateTime endTime);
+    Boolean findOpenOrOverlappingShift(@Param("startTime") LocalDateTime startTime);
 
     @Modifying
     @Query(value ="UPDATE shifts "+
@@ -29,7 +28,7 @@ public interface ShiftRepo extends JpaRepository<Shift,Integer> {
             "total_expenses = subquery.total_query_expenses, " +
             "total_shift = subquery.total_query_orders - subquery.total_query_credits - subquery.total_query_expenses, " +
             "closed_at = NOW(), " +
-            "user_id_closed = :userId " +
+            "closed = TRUE " +
             "FROM ( " +
             "SELECT " +
             "        (SELECT COALESCE(SUM(o.amount), 0) AS total_query_orders FROM orders o WHERE o.shift_id = :shiftId ), " +
@@ -38,7 +37,7 @@ public interface ShiftRepo extends JpaRepository<Shift,Integer> {
             ") AS subquery " +
             "WHERE shifts.id = :shiftId "
             , nativeQuery = true)
-    Integer closeShift(@Param("shiftId") Integer shiftId, @Param("userId") Integer userId);
+    Integer closeShift(@Param("shiftId") Integer shiftId);
 
     @Query(value = "SELECT * FROM shifts WHERE (cast(:beforeDate as timestamp without time zone) IS NULL OR created_at >= :beforeDate)" +
             " AND (cast(:afterDate as timestamp without time zone) IS NULL OR created_at <= :afterDate)" +

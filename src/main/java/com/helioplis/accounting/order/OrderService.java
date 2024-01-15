@@ -41,7 +41,7 @@ public class OrderService {
         if (dto.getShift() != null){
             Integer shiftId = dto.getShift().getId();
             Shift shift = shiftRepo.findById(shiftId).orElseThrow(()-> new ApiRequestException("No Shift by that ID"));
-            if (shift.getClosed_at() != null){
+            if (shift.isClosed()){
                 throw new ApiRequestException("This Shift is closed open it first and then modify");
             }
 

@@ -26,7 +26,12 @@ public class ExpenseService {
 
     public Expense addNewExpense(Expense expense){
         Shift shift =  expense.getShift();
+        System.out.println(shift.getId());
         shiftRepo.findById(shift.getId()).orElseThrow(() -> new ApiRequestException("No Shift with that Id"));
+        System.out.println(shift.isClosed());
+        if (shift.isClosed()){
+            throw new ApiRequestException("This Shift is closed open it first and then modify");
+        }
         return expenseRepo.save(expense);
     }
 
@@ -49,15 +54,15 @@ public class ExpenseService {
 
     }
 
-    public Expense updateExpense(ExpenseUpdateDTO dto, Integer userId) {
+    public Expense updateExpense(ExpenseUpdateDTO dto, String username) {
         Expense myExpense = expenseRepo.findById(dto.getId()).orElseThrow(() -> new ApiRequestException("No Expense with that ID"));
-        if (myExpense.getUser().getId() != userId){
+        if (!myExpense.getUser().equals(username)){
             throw  new ApiRequestException("Only the user who created the expense can modify it");
         }
         if (dto.getShift() != null){
             Integer shiftId = dto.getShift().getId();
             Shift shift = shiftRepo.findById(shiftId).orElseThrow(()-> new ApiRequestException("No Shift by that ID"));
-            if (shift.getClosed_at() != null){
+            if (shift.isClosed()){
                 throw new ApiRequestException("This Shift is closed open it first and then modify");
             }
 
@@ -72,10 +77,10 @@ public class ExpenseService {
     }
 
     @Transactional
-    public void deleteCredit(Integer expenseId, Principal principal){
+    public void deleteExpense(Integer expenseId, Principal principal){
         Expense expense = expenseRepo.findById(expenseId).orElseThrow(()-> new ApiRequestException("No expense with that ID"));
 
-        if (!expense.getUser().getUsername().equals(principal.getName())){
+        if (!expense.getUser().equals(principal.getName())){
             throw new ApiRequestException("Only the user who created the expense can delete it");
         }
         expenseRepo.delete(expense);

@@ -10,17 +10,7 @@ import java.security.Principal;
 import java.util.ArrayList;
 import java.util.List;
 
-@RestController
-@RequestMapping(value = "api/v1/pay/")
-@AllArgsConstructor
-@Slf4j
+
 public class PayController {
-    final private PayService payService;
 
-    @GetMapping("create")
-    public List<Pay> createPays(Principal principal){
-        List<Pay>  pays= new ArrayList<>();
-        return pays;
-
-    }
 }

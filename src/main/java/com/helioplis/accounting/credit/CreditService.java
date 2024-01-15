@@ -27,7 +27,7 @@ public class CreditService {
     public Credit addNewCredit(Credit credit){
 
         Shift shift = shiftRepo.findById(credit.getShift().getId()).orElseThrow(() -> new ApiRequestException("No Shift with that Id"));
-        if (shift.getClosed_at() != null){
+        if (shift.isClosed()){
             throw new ApiRequestException("This Shift is closed open it first and then modify");
         }
         return creditRepo.save(credit);
@@ -52,15 +52,15 @@ public class CreditService {
 
     }
 
-    public Credit updateCredit(CreditUpdateDTO dto, Integer userId) {
+    public Credit updateCredit(CreditUpdateDTO dto, String username) {
         Credit myCredit = creditRepo.findById(dto.getId()).orElseThrow(() -> new ApiRequestException("No Credit with that ID"));
-        if (myCredit.getUser().getId() != userId){
+        if (!myCredit.getUser().equals(username)){
             throw  new ApiRequestException("Only the user who created the credit can modify it");
         }
         if (dto.getShift() != null){
             Integer shiftId = dto.getShift().getId();
             Shift shift = shiftRepo.findById(shiftId).orElseThrow(()-> new ApiRequestException("No Shift by that ID"));
-            if (shift.getClosed_at() != null){
+            if (shift.isClosed()){
                 throw new ApiRequestException("This Shift is closed open it first and then modify");
             }
 
@@ -80,7 +80,7 @@ public class CreditService {
 
         Credit credit = creditRepo.findById(creditId).orElseThrow(()-> new ApiRequestException("No credit with that ID"));
 
-        if (!credit.getUser().getUsername().equals(principal.getName())){
+        if (!credit.getUser().equals(principal.getName())){
             throw new ApiRequestException("Only the user who created the credit can delete it");
         }
         creditRepo.delete(credit);

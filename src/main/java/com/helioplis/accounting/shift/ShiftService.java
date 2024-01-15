@@ -18,8 +18,7 @@ public class ShiftService {
     private final UserRepository userRepository;
 
     public Shift addNewShift(Shift shift){
-        if (shiftRepo.findOpenOrOverlappingShift(shift.getCreatedAt(), shift.getClosed_at())){
-            System.out.println(shift.getCreatedAt());
+        if (shiftRepo.findOpenOrOverlappingShift(shift.getCreatedAt())){
             throw new ApiRequestException("There is an open shift or an overlapping shift, you need to close the open shift or modify the dates if overlapping");
         }
         return shiftRepo.save(shift);
@@ -36,20 +35,24 @@ public class ShiftService {
         ShiftDTO dto = new ShiftDTO();
         dto.setId(shift.getId());
         dto.setUserOpen(shift.getUserOpen());
-        dto.setUserClose(shift.getUserClose());
         dto.setTotalShift(shift.getTotalShift());
         dto.setCreatedAt(shift.getCreatedAt());
         dto.setClosed_at(shift.getClosed_at());
+        dto.setClosed(shift.isClosed());
         return dto;
     }
     @Transactional
     public Integer closeShift(Integer shiftId, Principal principal){
         Shift shift = shiftRepo.findById(shiftId).orElseThrow(() -> new ApiRequestException("No shift is by that id"));
-        if (shift.getClosed_at() != null){
+        if (shift.isClosed()){
             throw new ApiRequestException("This Shift is closed modify it first");
         }
-        UserHelioplis user = userRepository.findByUsername(principal.getName()).get();
-        return shiftRepo.closeShift(shift.getId(), user.getId());
+        if (!shift.getUserOpen().equals(principal.getName())){
+
+            throw new ApiRequestException("only the user who created the shift can close it");
+
+        }
+        return shiftRepo.closeShift(shift.getId());
     }
 
     public Shift reopen(Integer shidtId, Principal principal){
@@ -58,19 +61,12 @@ public class ShiftService {
         }
         Shift shift = shiftRepo.findById(shidtId).orElseThrow(()-> new ApiRequestException("There is no shift by that ID"));
         UserHelioplis user = userRepository.findByUsername(principal.getName()).get();
-        if (shift.getUserOpen().getId() != user.getId()){
+        if (!shift.getUserOpen().equals(user.getUsername())){
             throw new ApiRequestException("The user who opened the shift must reopen it");
         }
-        shift.setClosed_at(null);
+        shift.setClosed(false);
         return shiftRepo.save(shift);
     }
 
-    public void deleteShift(Integer shiftId, Principal principal){
-        Shift shift = shiftRepo.findById(shiftId).orElseThrow(() -> new ApiRequestException("No shift with that ID"));
-        if (! shift.getUserOpen().getUsername().equals(principal.getName())){
-            throw new ApiRequestException("Only the user who created the shift can delete it");
-        }
-        shiftRepo.delete(shift);
-    }
 
 }

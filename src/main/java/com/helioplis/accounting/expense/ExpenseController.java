@@ -63,8 +63,7 @@ public class ExpenseController {
 
     @PutMapping("update")
     public Expense updateExpense(@RequestBody ExpenseUpdateDTO dto, Principal principal){
-        Optional<UserHelioplis> user = userRepository.findByUsername(principal.getName());
-        return   expenseService.updateExpense(dto, user.get().getId());
+        return   expenseService.updateExpense(dto, principal.getName());
     }
 
     @GetMapping("retrieve/{expenseId}")
@@ -73,8 +72,8 @@ public class ExpenseController {
     }
 
     @DeleteMapping("delete/{expenseId}")
-    public ResponseEntity<Void> deleteCredit(@PathVariable Integer expenseId, Principal principal){
-        expenseService.deleteCredit(expenseId, principal);
+    public ResponseEntity<Void> deleteExpense(@PathVariable Integer expenseId, Principal principal){
+        expenseService.deleteExpense(expenseId, principal);
         return ResponseEntity.noContent().build();
     }
 

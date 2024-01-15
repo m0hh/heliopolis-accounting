@@ -53,7 +53,7 @@ public class OrderController {
             throw new ApiRequestException(e.getMessage());
         }
         Shift shift = shiftRepo.findById(shiftId).orElseThrow(() -> new ApiRequestException("No shift is by that id"));
-        if (shift.getClosed_at() != null){
+        if (shift.isClosed()){
             throw new ApiRequestException("This Shift is closed modify it first");
         }
         orderService.createFromExcel(inputStream, shift);

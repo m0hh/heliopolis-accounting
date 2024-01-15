@@ -72,4 +72,7 @@ public class Expense {
         this.shift = shift;
     }
 
+    public String getUser() {
+        return user.getUsername();
+    }
 }

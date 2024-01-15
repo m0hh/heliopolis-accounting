@@ -37,14 +37,7 @@ public class Shift {
     )
     private UserHelioplis userOpen;
 
-    @ManyToOne
-    @JoinColumn(
-            name = "user_id_closed",
-            referencedColumnName = "id",
-            foreignKey = @ForeignKey(name = "fk_shift_user_close"),
-            nullable = true
-    )
-    private UserHelioplis userClose;
+
     @OneToMany(
             mappedBy = "shift",
             orphanRemoval = false,
@@ -104,6 +97,9 @@ public class Shift {
     @JsonBackReference
     private Pay pay;
 
+    @Column(name = "closed")
+    private boolean closed = false;
+
 
 
 
@@ -152,5 +148,9 @@ public class Shift {
             order.setShift(this);
         }
         this.orders = orders;
+    }
+
+    public String getUserOpen() {
+        return userOpen.getUsername();
     }
 }

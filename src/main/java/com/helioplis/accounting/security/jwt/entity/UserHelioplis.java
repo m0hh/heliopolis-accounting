@@ -1,6 +1,8 @@
 package com.helioplis.accounting.security.jwt.entity;
 
 import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -8,6 +10,11 @@ import jakarta.persistence.*;
 
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @Data
 @Entity
@@ -44,5 +51,11 @@ public class UserHelioplis {
             joinColumns = @JoinColumn(name="user_id")
     )
     @Column(name="user_role")
+    @NotNull
     private Set<String> roles;
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    @Column(name="firbase_token")
+    private String firbaseToken;
+
 }

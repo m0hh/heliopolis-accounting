@@ -52,8 +52,7 @@ public class CreditController {
     }
     @PutMapping("update")
     public Credit updateCredit(@RequestBody  CreditUpdateDTO dto, Principal principal){
-        Optional<UserHelioplis> user = userRepository.findByUsername(principal.getName());
-        return   creditService.updateCredit(dto, user.get().getId());
+        return   creditService.updateCredit(dto, principal.getName());
     }
     @GetMapping("retrieve/{creditId}")
     public Credit retrieveCredit(@PathVariable Integer creditId, Principal principal){
