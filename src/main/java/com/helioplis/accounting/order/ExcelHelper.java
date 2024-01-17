@@ -81,6 +81,9 @@ public class ExcelHelper {
                 Cell dateCell = currentRow.getCell(3);
                 if (dateCell != null && dateCell.getCellType() != CellType.BLANK) {
                     LocalDateTime date = LocalDateTime.parse(dateCell.getStringCellValue(), formatter);
+                    if (shift.getCreatedAt().isAfter(date)){
+                        continue;
+                    }
                     order.setCreatedAt(date);
                 }else {
                     try {

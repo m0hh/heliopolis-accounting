@@ -49,10 +49,13 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests
                 (authorize ->
-                        authorize.requestMatchers("/user/saveUser","/user/loginUser")
+                        authorize.requestMatchers("/user/loginUser")
                                 .permitAll()
+                                .requestMatchers("/user/saveUser")
+                                .hasAuthority("Admin")
                                 .anyRequest()
-                                .authenticated())
+                                .authenticated()
+                )
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(secFilter, UsernamePasswordAuthenticationFilter.class)

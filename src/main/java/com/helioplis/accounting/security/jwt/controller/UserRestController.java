@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.helioplis.accounting.exeption.ApiRequestException;
-import com.helioplis.accounting.security.jwt.entity.FireBaseTokenRequest;
+import com.helioplis.accounting.firebase.FireBaseTokenRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

@@ -1,4 +1,4 @@
-package com.helioplis.accounting.security.jwt.entity;
+package com.helioplis.accounting.firebase;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
