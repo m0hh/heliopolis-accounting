@@ -68,5 +68,9 @@ public class ShiftService {
         return shiftRepo.save(shift);
     }
 
+    public Shift retrieve(Integer shiftId){
+        return shiftRepo.findById(shiftId).orElseThrow(() -> new ApiRequestException("No shift by that Id"));
+    }
+
 
 }

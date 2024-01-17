@@ -1,6 +1,9 @@
 package com.helioplis.accounting.order;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
 import com.helioplis.accounting.exeption.ApiRequestException;
+import com.helioplis.accounting.firebase.FirebaseMessagingService;
+import com.helioplis.accounting.firebase.Note;
 import com.helioplis.accounting.shift.Shift;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +26,7 @@ import java.util.*;
 @Slf4j
 public class ExcelHelper {
     private final DataFormatter dataFormatter;
+    private final FirebaseMessagingService firebaseMessagingService;
     public static String TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
     static String[] HEADERs = { "order_id", "created", "order_total"};
     static String SHEET = "Worksheet";
@@ -67,21 +71,36 @@ public class ExcelHelper {
                 if (orderIdCell != null && orderIdCell.getCellType() != CellType.BLANK) {
                     order.setOrderId((int) orderIdCell.getNumericCellValue());
                 }else {
-                    log.error("order cell row " + currentRow.getRowNum() + " is empty");
+                    try {
+                        firebaseMessagingService.sendNotificationToTopic(new Note("Order Creation", "order cell row " + currentRow.getRowNum() + " is empty"),"order_creation");
+                    }catch (FirebaseMessagingException e) {
+                        log.error("Firebase Error", e);
+                    }
+                    log.error("Error at creating orders: order cell row " + currentRow.getRowNum() + " is empty");
                 }
                 Cell dateCell = currentRow.getCell(3);
                 if (dateCell != null && dateCell.getCellType() != CellType.BLANK) {
                     LocalDateTime date = LocalDateTime.parse(dateCell.getStringCellValue(), formatter);
                     order.setCreatedAt(date);
                 }else {
-                    log.error("date cell row " + currentRow.getRowNum() + " is empty");
+                    try {
+                        firebaseMessagingService.sendNotificationToTopic(new Note("Order Creation", "date cell row " + currentRow.getRowNum() + " is empty"),"order_creation");
+                    }catch (FirebaseMessagingException e) {
+                        log.error("Firebase Error", e);
+                    }
+                    log.error("Error at creating orders: date cell row " + currentRow.getRowNum() + " is empty");
                 }
 
                 Cell amountCell = currentRow.getCell(17);
                 if (amountCell != null && amountCell.getCellType() != CellType.BLANK) {
                     order.setAmount(BigDecimal.valueOf(amountCell.getNumericCellValue()));
                 }else {
-                    log.error("amount cell row " + currentRow.getRowNum() + " is empty");
+                    try {
+                        firebaseMessagingService.sendNotificationToTopic(new Note("Order Creation", "amount cell row " + currentRow.getRowNum() + " is empty"),"order_creation");
+                    }catch (FirebaseMessagingException e) {
+                        log.error("Firebase Error", e);
+                    }
+                    log.error("Error at creating orders: amount cell row " + currentRow.getRowNum() + " is empty");
 
                 }
                 order.setShift(shift);
@@ -92,6 +111,12 @@ public class ExcelHelper {
 
             return orders;
         } catch (IOException e) {
+            try {
+                firebaseMessagingService.sendNotificationToTopic(new Note("Order Creation", "Failed To Parse the Excel file"),"order_creation");
+            }catch (FirebaseMessagingException ee) {
+                log.error("Firebase Error", ee);
+            }
+            log.error("Error at creating orders: fail to parse Excel file", e);
             throw new RuntimeException("fail to parse Excel file: " + e.getMessage());
         }
     }

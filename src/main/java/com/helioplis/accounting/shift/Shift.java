@@ -65,19 +65,19 @@ public class Shift {
     @JsonManagedReference
     private List<Order> orders = new ArrayList<>();
 
-    @Digits(integer=10, fraction=5, message = "You must enter a number")
+    @Digits(integer=10, fraction=2, message = "You must enter a number")
     @Column(name = "total_orders", precision = 10, scale = 2,nullable = true)
     private BigDecimal totalOrders;
 
-    @Digits(integer=10, fraction=5, message = "You must enter a number")
+    @Digits(integer=10, fraction=2, message = "You must enter a number")
     @Column(name = "total_credits", precision = 10, scale = 2,nullable = true)
     private BigDecimal totalCredits;
 
-    @Digits(integer=10, fraction=5, message = "You must enter a number")
+    @Digits(integer=10, fraction=2, message = "You must enter a number")
     @Column(name = "total_expenses", precision = 10, scale = 2,nullable = true)
     private BigDecimal totalExpenses;
 
-    @Digits(integer=10, fraction=5, message = "You must enter a number")
+    @Digits(integer=10, fraction=2, message = "You must enter a number")
     @Column(name = "total_shift", precision = 10, scale = 2,nullable = true)
     private BigDecimal totalShift;
 

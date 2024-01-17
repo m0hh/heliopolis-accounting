@@ -1,10 +1,14 @@
 package com.helioplis.accounting.pay;
 
+import com.google.firebase.messaging.FirebaseMessagingException;
+import com.helioplis.accounting.firebase.FirebaseMessagingService;
+import com.helioplis.accounting.firebase.Note;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import com.helioplis.accounting.security.jwt.repo.UserRepository;
 import com.helioplis.accounting.shift.Shift;
 import com.helioplis.accounting.shift.ShiftRepo;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,12 +20,14 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @AllArgsConstructor
 public class PayService {
     private final UserRepository userRepository;
     private final ShiftRepo shiftRepo;
     private final PayRepo payRepo;
+    private final FirebaseMessagingService firebaseMessagingService;
     @Transactional
     public void createPays(){
         LocalDateTime afterDate = LocalDateTime.now();
@@ -39,14 +45,20 @@ public class PayService {
                 totalHours += shift.getCreatedAt().until(shift.getClosed_at(), ChronoUnit.HOURS);
             }
             totalPay = totalHours * user.getHourlyRate().doubleValue();
-            totalDeduction = (168.0 * user.getHourlyRate().doubleValue()) - totalPay;
+            totalDeduction = (user.getHoursToWork().doubleValue() * user.getHourlyRate().doubleValue()) - totalPay;
             pay.setCreatedAt(LocalDate.now());
             pay.setTotalPay(BigDecimal.valueOf(totalPay));
             pay.setTotalHours(BigDecimal.valueOf(totalHours));
             pay.setTotalDeduction(BigDecimal.valueOf(totalDeduction));
             pay.setUser(user);
             payRepo.save(pay);
-            // send notification
+            if (!user.getFirbaseToken().isBlank()){
+                try {
+                    firebaseMessagingService.sendNotificationToUser(new Note("Pay", "Your Pay is calculated"), user.getFirbaseToken());
+                }catch (FirebaseMessagingException e) {
+                    log.error("Firebase Error", e);
+                }
+            }
         }
 
     }

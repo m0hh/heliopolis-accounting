@@ -23,13 +23,13 @@ public class Pay {
     @GeneratedValue(generator = "pay_id_seq")
     private Integer id;
 
-    @Column(name = "total_hours", precision = 5, scale = 5,nullable = true)
+    @Column(name = "total_hours", precision = 10, scale = 2,nullable = true)
     private BigDecimal totalHours;
 
-    @Column(name = "total_pay", precision = 5, scale = 5,nullable = true)
+    @Column(name = "total_pay", precision = 10, scale = 2,nullable = true)
     private BigDecimal totalPay;
 
-    @Column(name = "total_deduction", precision = 5, scale = 5,nullable = true)
+    @Column(name = "total_deduction", precision = 10, scale = 2,nullable = true)
     private BigDecimal totalDeduction;
 
     @Column(name = "created_at", nullable = false)

@@ -41,7 +41,7 @@ public class Credit {
     )
     private UserHelioplis user;
 
-    @Digits(integer=10, fraction=5, message = "You must enter a number")
+    @Digits(integer=10, fraction=2, message = "You must enter a number")
     @NotNull(message = "amount cannot bel blank or null")
     @Column(name = "amount", precision = 10, scale = 2,nullable = false)
     private BigDecimal amount;

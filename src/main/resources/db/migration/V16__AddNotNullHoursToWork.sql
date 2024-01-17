@@ -1,0 +1,1 @@
+ALTER TABLE users ALTER COLUMN hours_to_work SET NOT NULL;

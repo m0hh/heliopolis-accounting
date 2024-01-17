@@ -59,5 +59,10 @@ public class ShiftController {
         return shiftService.reopen(shiftId, principal);
     }
 
+    @GetMapping("retrieve/{shiftId}")
+    Shift retrieveShift(@PathVariable Integer shiftId, Principal principal){
+        return shiftService.retrieve(shiftId);
+    }
+
 
 }

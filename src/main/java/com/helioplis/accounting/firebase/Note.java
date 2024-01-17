@@ -10,4 +10,9 @@ public class Note {
     private String content;
     private Map<String, String> data;
     private String image;
+
+    public Note(String subject, String content) {
+        this.subject = subject;
+        this.content = content;
+    }
 }

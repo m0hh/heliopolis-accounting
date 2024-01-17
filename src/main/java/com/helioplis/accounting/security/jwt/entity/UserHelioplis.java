@@ -42,9 +42,12 @@ public class UserHelioplis {
     private String email;
 
     @NotNull
-    @Column(name="hourly_rate", precision = 5,scale = 5, nullable = false)
+    @Column(name="hourly_rate", precision = 10,scale = 2, nullable = false)
     private BigDecimal hourlyRate;
 
+    @NotNull
+    @Column(name="hours_to_work", precision = 10,scale = 2, nullable = false)
+    private BigDecimal hoursToWork;
     @ElementCollection(fetch= FetchType.EAGER)
     @CollectionTable(
             name="roles",
