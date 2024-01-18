@@ -9,6 +9,7 @@ import com.helioplis.accounting.shift.Shift;
 import com.helioplis.accounting.shift.ShiftRepo;
 import lombok.AllArgsConstructor;
 import org.apache.commons.math3.analysis.function.Exp;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,7 +38,7 @@ public class ExpenseService {
         return expenseRepo.save(expense);
     }
 
-    List<ExpenseListDTO> listExpenses(String s_date, String e_date,Integer shiftId)
+    List<ExpenseListDTO> listExpenses(String s_date, String e_date,Integer shiftId, Integer page)
     {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         LocalDateTime start_date = null;
@@ -52,7 +53,7 @@ public class ExpenseService {
         } catch (DateTimeParseException e){
             throw new ApiRequestException("Wrong date format, the correct format is yyyy-MM-ddTHH:mm:ss", e);
         }
-        List<Expense> expenses =  expenseRepo.findFilter(start_date,end_date,shiftId);
+        List<Expense> expenses =  expenseRepo.findFilter(start_date,end_date,shiftId, PageRequest.of(page, 10));
 
         return  expenses.stream().map(this :: convertToDTO).collect(Collectors.toList());
 

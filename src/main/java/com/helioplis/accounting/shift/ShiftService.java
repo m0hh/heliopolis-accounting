@@ -4,10 +4,16 @@ import com.helioplis.accounting.exeption.ApiRequestException;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import com.helioplis.accounting.security.jwt.repo.UserRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.security.Principal;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,8 +30,27 @@ public class ShiftService {
         return shiftRepo.save(shift);
     }
 
-    public List<ShiftListDTO> shiftList(){
-        List<Shift> shifts =  shiftRepo.findAll();
+    public List<ShiftListDTO> shiftList(String s_date, String e_date, Principal principal, Integer page){
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        LocalDateTime start_date = null;
+        LocalDateTime end_date = null;
+        try {
+            if (s_date != null) {
+                start_date = LocalDateTime.parse(s_date, formatter);
+            }
+            if(e_date != null) {
+                end_date = LocalDateTime.parse(e_date, formatter);
+            }
+        } catch (DateTimeParseException e){
+            throw new ApiRequestException("Wrong date format, the correct format is yyyy-MM-ddTHH:mm:ss", e);
+        }
+
+        Integer userId = null;
+        if (principal != null){
+            UserHelioplis userHelioplis = userRepository.findByUsername(principal.getName()).get();
+            userId = userHelioplis.getId();
+        }
+        List<Shift> shifts =  shiftRepo.findFilter(start_date, end_date, userId, PageRequest.of(page,10));
         return shifts.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());

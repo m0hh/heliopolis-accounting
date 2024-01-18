@@ -39,7 +39,7 @@ public class PayService {
             double totalDeduction;
             Pay pay = new Pay();
 
-            List<Shift> shifts = shiftRepo.findFilter(beforeDate, afterDate, user.getId());
+            List<Shift> shifts = shiftRepo.findFilter(beforeDate, afterDate, user.getId(), null);
             for (Shift shift : shifts) {
                 pay.addShift(shift);
                 totalHours += shift.getCreatedAt().until(shift.getClosed_at(), ChronoUnit.HOURS);

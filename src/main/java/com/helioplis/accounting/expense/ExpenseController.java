@@ -54,11 +54,16 @@ public class ExpenseController {
     public List<ExpenseListDTO> listExpenses(
             @RequestParam(name = "start_date",required = false) String start_date,
             @RequestParam(name = "end_date",required = false) String end_date,
-            @RequestParam(name = "shift_id", required = false) Integer shiftId
+            @RequestParam(name = "shift_id", required = false) Integer shiftId,
+            @RequestParam(name = "page", required = false) Integer page
+
 
 
     ){
-        return expenseService.listExpenses(start_date,end_date,shiftId);
+        if (page == null){
+            throw new ApiRequestException("Specify the page");
+        }
+        return expenseService.listExpenses(start_date,end_date,shiftId, page);
     }
 
     @PutMapping("update")

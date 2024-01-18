@@ -9,6 +9,7 @@ import com.helioplis.accounting.shift.ShiftService;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.weaver.ast.Or;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
@@ -31,8 +32,8 @@ public class OrderService {
         orderRepo.saveAll(orders);
     }
 
-    public List<Order> listOrdersfilter(LocalDateTime beforeDate, LocalDateTime afterDate, Integer shiftId){
-        return orderRepo.findFilter(beforeDate, afterDate, shiftId);
+    public List<Order> listOrdersfilter(LocalDateTime beforeDate, LocalDateTime afterDate, Integer shiftId, Integer page){
+        return orderRepo.findFilter(beforeDate, afterDate, shiftId, PageRequest.of(page, 10));
     }
 
     public Order updateOrder(OrderUpdateDTO dto) {

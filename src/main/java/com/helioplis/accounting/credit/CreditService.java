@@ -9,6 +9,8 @@ import com.helioplis.accounting.shift.ShiftListDTO;
 import com.helioplis.accounting.shift.ShiftRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +37,7 @@ public class CreditService {
         return creditRepo.save(credit);
     }
 
-    List<CreditListDTO> listCredits(String s_date, String e_date, Integer shiftId)
+    List<CreditListDTO> listCredits(String s_date, String e_date, Integer shiftId, Integer page)
     {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         LocalDateTime start_date = null;
@@ -50,7 +52,7 @@ public class CreditService {
         } catch (DateTimeParseException e){
             throw new ApiRequestException("Wrong date format, the correct format is yyyy-MM-ddTHH:mm:ss", e);
         }
-        List<Credit> credits =  creditRepo.findFilter(start_date,end_date, shiftId);
+        List<Credit> credits =  creditRepo.findFilter(start_date,end_date, shiftId, PageRequest.of(page,10));
         return credits.stream().map(this :: convertToDTO).collect(Collectors.toList());
 
     }

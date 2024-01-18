@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -44,11 +45,15 @@ public class CreditController {
     public List<CreditListDTO> listCredits(
             @RequestParam(name = "start_date",required = false) String start_date,
             @RequestParam(name = "end_date",required = false) String  end_date,
-            @RequestParam(name = "shift_id", required = false) Integer shiftId
+            @RequestParam(name = "shift_id", required = false) Integer shiftId,
+            @RequestParam(name = "page", required = false) Integer page
+
 
     ){
-
-        return creditService.listCredits(start_date,end_date, shiftId);
+        if (page == null){
+            throw new ApiRequestException("Specify the page");
+        }
+        return creditService.listCredits(start_date,end_date, shiftId, page);
     }
     @PutMapping("update")
     public Credit updateCredit(@RequestBody  CreditUpdateDTO dto, Principal principal){

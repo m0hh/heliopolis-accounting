@@ -64,11 +64,16 @@ public class OrderController {
     public List<Order> listOrders(
             @RequestParam(name = "start_date",required = false) LocalDateTime start_date,
             @RequestParam(name = "end_date",required = false) LocalDateTime end_date,
-            @RequestParam(name = "shift_id", required = false) Integer shiftId
+            @RequestParam(name = "shift_id", required = false) Integer shiftId,
+            @RequestParam(name = "page", required = false) Integer page
+
 
 
     ){
-        return orderService.listOrdersfilter(start_date,end_date,shiftId);
+        if (page == null){
+            throw new ApiRequestException("Specify the page");
+        }
+        return orderService.listOrdersfilter(start_date,end_date,shiftId, page);
     }
 
     @PutMapping("update")

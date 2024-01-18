@@ -3,6 +3,7 @@ package com.helioplis.accounting.shift;
 import com.helioplis.accounting.expense.Expense;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import jakarta.persistence.SqlResultSetMapping;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -41,6 +42,10 @@ public interface ShiftRepo extends JpaRepository<Shift,Integer> {
 
     @Query(value = "SELECT * FROM shifts WHERE (cast(:beforeDate as timestamp without time zone) IS NULL OR created_at >= :beforeDate)" +
             " AND (cast(:afterDate as timestamp without time zone) IS NULL OR created_at <= :afterDate)" +
-            " AND (cast(:userId as INTEGER) IS NULL OR user_id_opened = :userId)", nativeQuery = true)
-    List<Shift> findFilter(@Param("beforeDate") LocalDateTime beforeDate, @Param("afterDate") LocalDateTime afterDate, @Param("userId") Integer userId);
+            " AND (cast(:userId as INTEGER) IS NULL OR user_id_opened = :userId) ORDER BY closed ASC",
+            countQuery = "SELECT * FROM shifts WHERE (cast(:beforeDate as timestamp without time zone) IS NULL OR created_at >= :beforeDate)" +
+                    " AND (cast(:afterDate as timestamp without time zone) IS NULL OR created_at <= :afterDate)" +
+                    " AND (cast(:userId as INTEGER) IS NULL OR user_id_opened = :userId) ORDER BY closed ASC",
+            nativeQuery = true)
+    List<Shift> findFilter(@Param("beforeDate") LocalDateTime beforeDate, @Param("afterDate") LocalDateTime afterDate, @Param("userId") Integer userId, Pageable pageable);
 }

@@ -1,5 +1,6 @@
 package com.helioplis.accounting.shift;
 
+import com.helioplis.accounting.exeption.ApiRequestException;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import com.helioplis.accounting.security.jwt.repo.UserRepository;
 import lombok.AllArgsConstructor;
@@ -36,8 +37,20 @@ public class ShiftController {
     }
 
     @GetMapping("list")
-    public List<ShiftListDTO> listShifts(Principal principal){
-        return shiftService.shiftList();
+    public List<ShiftListDTO> listShifts(Principal principal,
+                                         @RequestParam(name = "page", required = false) Integer page,
+                                         @RequestParam(name = "start_date",required = false) String start_date,
+                                         @RequestParam(name = "end_date",required = false) String end_date,
+                                         @RequestParam(name = "get_user", required = false,defaultValue = "false") String get_user)
+    {
+        if (page == null){
+            throw new ApiRequestException("Specify the page");
+        }
+        Principal getUser = null;
+        if (!get_user.equals("false")){
+            getUser = principal;
+        }
+        return shiftService.shiftList(start_date, end_date, getUser, page);
     }
 
     @PostMapping("close/{shiftId}")
