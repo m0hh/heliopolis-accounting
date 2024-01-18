@@ -5,6 +5,7 @@ import com.helioplis.accounting.expense.Expense;
 import com.helioplis.accounting.expense.ExpenseRepo;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
 import com.helioplis.accounting.shift.Shift;
+import com.helioplis.accounting.shift.ShiftListDTO;
 import com.helioplis.accounting.shift.ShiftRepo;
 import lombok.AllArgsConstructor;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -33,7 +35,7 @@ public class CreditService {
         return creditRepo.save(credit);
     }
 
-    List<Credit> listCredits(String s_date, String e_date, Integer shiftId)
+    List<CreditListDTO> listCredits(String s_date, String e_date, Integer shiftId)
     {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         LocalDateTime start_date = null;
@@ -48,8 +50,18 @@ public class CreditService {
         } catch (DateTimeParseException e){
             throw new ApiRequestException("Wrong date format, the correct format is yyyy-MM-ddTHH:mm:ss", e);
         }
-        return creditRepo.findFilter(start_date,end_date, shiftId);
+        List<Credit> credits =  creditRepo.findFilter(start_date,end_date, shiftId);
+        return credits.stream().map(this :: convertToDTO).collect(Collectors.toList());
 
+    }
+
+    private CreditListDTO convertToDTO(Credit credit) {
+        CreditListDTO dto = new CreditListDTO();
+        dto.setId(credit.getId());
+        dto.setAmount(credit.getAmount());
+        dto.setDescription(credit.getDescription());
+        dto.setCreatedAt(credit.getCreatedAt());
+        return dto;
     }
 
     public Credit updateCredit(CreditUpdateDTO dto, String username) {

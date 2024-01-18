@@ -24,15 +24,15 @@ public class ShiftService {
         return shiftRepo.save(shift);
     }
 
-    public List<ShiftDTO> shiftList(){
+    public List<ShiftListDTO> shiftList(){
         List<Shift> shifts =  shiftRepo.findAll();
         return shifts.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
 
     }
-    private ShiftDTO convertToDTO(Shift shift) {
-        ShiftDTO dto = new ShiftDTO();
+    private ShiftListDTO convertToDTO(Shift shift) {
+        ShiftListDTO dto = new ShiftListDTO();
         dto.setId(shift.getId());
         dto.setUserOpen(shift.getUserOpen());
         dto.setTotalShift(shift.getTotalShift());

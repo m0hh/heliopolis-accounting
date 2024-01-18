@@ -2,6 +2,7 @@ package com.helioplis.accounting.expense;
 
 
 import com.helioplis.accounting.credit.Credit;
+import com.helioplis.accounting.credit.CreditListDTO;
 import com.helioplis.accounting.credit.CreditUpdateDTO;
 import com.helioplis.accounting.exeption.ApiRequestException;
 import com.helioplis.accounting.shift.Shift;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @Service
@@ -35,7 +37,7 @@ public class ExpenseService {
         return expenseRepo.save(expense);
     }
 
-    List<Expense> listExpenses(String s_date, String e_date,Integer shiftId)
+    List<ExpenseListDTO> listExpenses(String s_date, String e_date,Integer shiftId)
     {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         LocalDateTime start_date = null;
@@ -50,8 +52,19 @@ public class ExpenseService {
         } catch (DateTimeParseException e){
             throw new ApiRequestException("Wrong date format, the correct format is yyyy-MM-ddTHH:mm:ss", e);
         }
-        return expenseRepo.findFilter(start_date,end_date,shiftId);
+        List<Expense> expenses =  expenseRepo.findFilter(start_date,end_date,shiftId);
 
+        return  expenses.stream().map(this :: convertToDTO).collect(Collectors.toList());
+
+    }
+
+    private ExpenseListDTO convertToDTO(Expense expense) {
+        ExpenseListDTO dto = new ExpenseListDTO();
+        dto.setId(expense.getId());
+        dto.setAmount(expense.getAmount());
+        dto.setDescription(expense.getDescription());
+        dto.setCreatedAt(expense.getCreatedAt());
+        return dto;
     }
 
     public Expense updateExpense(ExpenseUpdateDTO dto, String username) {

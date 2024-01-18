@@ -32,7 +32,7 @@ public class Expense {
             updatable = false
     )
     private Integer id;
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(
             name = "user_id",
             referencedColumnName = "id",
