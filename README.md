@@ -171,3 +171,5 @@ if you send a wrong date format you will receive
 
 you can also send a query param to filter shifts by the user who created the request by specifying  get_user=true
 
+## To Be Completed
+
