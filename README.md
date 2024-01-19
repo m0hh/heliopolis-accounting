@@ -156,5 +156,18 @@ pagination here is required you will receive this response if you didn't specify
 }
 ```
 
+You can send an optional query params of start_date and end_date  which are the dates you filter shift by
+the format of the dates is yyyy-MM-ddTHH:mm:ss
 
+if you send a wrong date format you will receive 
+
+```json
+{
+    "message": "Wrong date format, the correct format is yyyy-MM-ddTHH:mm:ss",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-19T07:53:00.051934871Z"
+}
+```
+
+you can also send a query param to filter shifts by the user who created the request by specifying  get_user=true
 
