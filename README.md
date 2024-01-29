@@ -42,6 +42,7 @@ A shift have:
 - closed: a boolean indicating is this shift is closed or not
 
 All the upcoming requests must be sent with jwt token in Authorization Headers
+userOpen has its getter overriden to return only the username 
 
 ### Creating a Shift
 
@@ -171,5 +172,820 @@ if you send a wrong date format you will receive
 
 you can also send a query param to filter shifts by the user who created the request by specifying  get_user=true
 
-## To Be Completed
+#### Closing a shift
+By closing a shift you calculate all the orders created, and you subtract all the expenses and credits of these shifts, the calculation happens inside the database
+defined by the method closeShift in the ShiftRepo.
+
+URL POST : /api/v1/shift/close/{shift ID}
+Needs to be sent with a JWT token
+
+You will receive a response of 1  and a status code of 200 ok of all goes well 
+
+if the token belonged to a user who didn't create the shift you will receive
+
+```json
+{
+    "message": "only the user who created the shift can close it",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-24T14:25:33.192314754Z"
+}
+```
+
+if the shift is already closed you will receive
+
+```json
+{
+    "message": "This Shift is closed modify it first",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-24T14:29:12.448661138Z"
+}
+```
+
+if the shift does not exist you will receive
+
+```json
+{
+    "message": "No shift is by that id",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-24T14:29:57.610722213Z"
+}
+```
+
+### Reopening a shift
+
+if you want to reopen a closed shift
+
+URL PUT : /api/v1/shift/reopen/{shift ID}
+ 
+
+```json
+{
+    "id": 15,
+    "userOpen": "mohamed",
+    "expenses": [],
+    "credits": [],
+    "orders": [],
+    "totalOrders": 0.00,
+    "totalCredits": 0.00,
+    "totalExpenses": 0.00,
+    "totalShift": 0.00,
+    "createdAt": "2024-01-18T13:46:57.121793",
+    "closed_at": "2024-01-24T16:26:22.106137",
+    "closed": false
+}
+```
+
+If there is any open shift already
+
+```json
+{
+    "message": "There is an open shift you need to close that first",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-27T12:10:40.459505402Z"
+}
+```
+
+If the user who sent the request is not the one who opened it in the first place
+
+```json
+{
+    "message": "The user who opened the shift must reopen it",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-27T12:12:32.389278004Z"
+}
+```
+
+If the ID sent does not exist
+
+```json
+{
+    "message": "There is no shift by that ID",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-27T12:13:23.723868268Z"
+}
+```
+
+### Retrieving a shift 
+
+Retrieving a shift will return the shift information with all it's orders, expenses and credits
+
+```json
+{
+  "id": 10,
+  "userOpen": "mohamed",
+  "expenses": [
+    {
+      "id": 16,
+      "user": "mohamed",
+      "amount": 12.50,
+      "description": "adfadcad",
+      "createdAt": "2024-01-15T09:10:31.833369"
+    },
+    {
+      "id": 17,
+      "user": "mohamed",
+      "amount": 12.50,
+      "description": "adfadcad",
+      "createdAt": "2024-01-15T09:10:32.901406"
+    },
+    {
+      "id": 18,
+      "user": "mohamed",
+      "amount": 12.50,
+      "description": "adfadcad",
+      "createdAt": "2024-01-15T09:10:33.800461"
+    },
+    {
+      "id": 19,
+      "user": "mohamed",
+      "amount": 12.50,
+      "description": "adfadcad",
+      "createdAt": "2024-01-15T09:11:35.881764"
+    },
+    {
+      "id": 20,
+      "user": "mohamed",
+      "amount": 12.50,
+      "description": "adfadcad",
+      "createdAt": "2024-01-15T09:12:34.404652"
+    },
+    {
+      "id": 21,
+      "user": "mohamed",
+      "amount": 12.50,
+      "description": "adfadcad",
+      "createdAt": "2024-01-15T09:13:23.721623"
+    },
+    {
+      "id": 22,
+      "user": "mohamed",
+      "amount": 12.50,
+      "description": "adfadcad",
+      "createdAt": "2024-01-15T09:14:27.579661"
+    },
+    {
+      "id": 23,
+      "user": "mohamed",
+      "amount": 12.50,
+      "description": "adfadcad",
+      "createdAt": "2024-01-15T09:27:50.127319"
+    },
+    {
+      "id": 24,
+      "user": "mohamed",
+      "amount": 12.50,
+      "description": "adfadcad",
+      "createdAt": "2024-01-15T09:28:54.58553"
+    }
+  ],
+  "credits": [
+    {
+      "amount": 13.50,
+      "description": "adfadcad",
+      "createdAt": "2024-01-15T09:10:46.472687",
+      "id": 17,
+      "user": "mohamed"
+    },
+    {
+      "amount": 13.50,
+      "description": "adfadcad",
+      "createdAt": "2024-01-15T09:10:47.564461",
+      "id": 18,
+      "user": "mohamed"
+    },
+    {
+      "amount": 13.50,
+      "description": "adfadcad",
+      "createdAt": "2024-01-15T09:10:48.477856",
+      "id": 19,
+      "user": "mohamed"
+    },
+    {
+      "amount": 13.50,
+      "description": "adfadcad",
+      "createdAt": "2024-01-15T09:10:49.414302",
+      "id": 20,
+      "user": "mohamed"
+    }
+  ],
+  "orders": [
+    {
+      "id": 617,
+      "orderId": 2391,
+      "createdAt": "2023-12-19T22:56:43",
+      "amount": 20.00
+    },
+    {
+      "id": 618,
+      "orderId": 2390,
+      "createdAt": "2023-12-19T22:55:59",
+      "amount": 75.00
+    },
+    {
+      "id": 619,
+      "orderId": 2389,
+      "createdAt": "2023-12-19T22:55:28",
+      "amount": 35.00
+    },
+    {
+      "id": 620,
+      "orderId": 2388,
+      "createdAt": "2023-12-19T22:34:30",
+      "amount": 25.00
+    },
+    {
+      "id": 621,
+      "orderId": 2387,
+      "createdAt": "2023-12-19T20:35:43",
+      "amount": 10.00
+    },
+    {
+      "id": 622,
+      "orderId": 2386,
+      "createdAt": "2023-12-19T20:16:31",
+      "amount": 15.00
+    },
+    {
+      "id": 623,
+      "orderId": 2385,
+      "createdAt": "2023-12-19T20:12:22",
+      "amount": 30.00
+    },
+    {
+      "id": 624,
+      "orderId": 2384,
+      "createdAt": "2023-12-19T20:11:31",
+      "amount": 20.00
+    },
+    {
+      "id": 625,
+      "orderId": 2383,
+      "createdAt": "2023-12-19T19:29:23",
+      "amount": 10.00
+    },
+    {
+      "id": 626,
+      "orderId": 2382,
+      "createdAt": "2023-12-19T19:26:51",
+      "amount": 65.00
+    },
+    {
+      "id": 627,
+      "orderId": 2381,
+      "createdAt": "2023-12-19T19:23:34",
+      "amount": 10.00
+    },
+    {
+      "id": 628,
+      "orderId": 2380,
+      "createdAt": "2023-12-19T19:17:55",
+      "amount": 40.00
+    },
+    {
+      "id": 629,
+      "orderId": 2379,
+      "createdAt": "2023-12-19T19:11:42",
+      "amount": 10.00
+    },
+    {
+      "id": 630,
+      "orderId": 2378,
+      "createdAt": "2023-12-19T19:00:55",
+      "amount": 15.00
+    },
+    {
+      "id": 631,
+      "orderId": 2377,
+      "createdAt": "2023-12-19T18:59:14",
+      "amount": 10.00
+    },
+    {
+      "id": 632,
+      "orderId": 2376,
+      "createdAt": "2023-12-19T18:51:10",
+      "amount": 30.00
+    },
+    {
+      "id": 633,
+      "orderId": 2375,
+      "createdAt": "2023-12-19T18:49:28",
+      "amount": 10.00
+    },
+    {
+      "id": 634,
+      "orderId": 2374,
+      "createdAt": "2023-12-19T18:48:55",
+      "amount": 30.00
+    },
+    {
+      "id": 635,
+      "orderId": 2373,
+      "createdAt": "2023-12-19T18:28:50",
+      "amount": 25.00
+    },
+    {
+      "id": 636,
+      "orderId": 2372,
+      "createdAt": "2023-12-19T18:27:57",
+      "amount": 5.00
+    },
+    {
+      "id": 637,
+      "orderId": 2371,
+      "createdAt": "2023-12-19T18:14:40",
+      "amount": 10.00
+    },
+    {
+      "id": 638,
+      "orderId": 2370,
+      "createdAt": "2023-12-19T18:12:00",
+      "amount": 50.00
+    },
+    {
+      "id": 639,
+      "orderId": 2369,
+      "createdAt": "2023-12-19T17:54:28",
+      "amount": 20.00
+    },
+    {
+      "id": 640,
+      "orderId": 2368,
+      "createdAt": "2023-12-19T17:53:01",
+      "amount": 110.00
+    },
+    {
+      "id": 641,
+      "orderId": 2367,
+      "createdAt": "2023-12-19T17:02:11",
+      "amount": 10.00
+    },
+    {
+      "id": 642,
+      "orderId": 2366,
+      "createdAt": "2023-12-19T16:48:52",
+      "amount": 10.00
+    },
+    {
+      "id": 643,
+      "orderId": 2365,
+      "createdAt": "2023-12-19T16:47:18",
+      "amount": 10.00
+    },
+    {
+      "id": 644,
+      "orderId": 2364,
+      "createdAt": "2023-12-19T16:46:24",
+      "amount": 25.00
+    },
+    {
+      "id": 645,
+      "orderId": 2363,
+      "createdAt": "2023-12-19T16:26:26",
+      "amount": 10.00
+    },
+    {
+      "id": 646,
+      "orderId": 2362,
+      "createdAt": "2023-12-19T16:25:25",
+      "amount": 20.00
+    },
+    {
+      "id": 647,
+      "orderId": 2361,
+      "createdAt": "2023-12-19T16:24:22",
+      "amount": 10.00
+    },
+    {
+      "id": 648,
+      "orderId": 2360,
+      "createdAt": "2023-12-19T16:23:54",
+      "amount": 45.00
+    },
+    {
+      "id": 649,
+      "orderId": 2359,
+      "createdAt": "2023-12-19T16:22:35",
+      "amount": 25.00
+    },
+    {
+      "id": 650,
+      "orderId": 2358,
+      "createdAt": "2023-12-19T15:20:19",
+      "amount": 60.00
+    },
+    {
+      "id": 651,
+      "orderId": 2357,
+      "createdAt": "2023-12-19T15:03:42",
+      "amount": 10.00
+    },
+    {
+      "id": 652,
+      "orderId": 2356,
+      "createdAt": "2023-12-19T14:32:50",
+      "amount": 20.00
+    },
+    {
+      "id": 653,
+      "orderId": 2355,
+      "createdAt": "2023-12-19T14:00:07",
+      "amount": 10.00
+    },
+    {
+      "id": 654,
+      "orderId": 2354,
+      "createdAt": "2023-12-19T13:49:55",
+      "amount": 15.00
+    },
+    {
+      "id": 655,
+      "orderId": 2353,
+      "createdAt": "2023-12-19T13:49:53",
+      "amount": 10.00
+    },
+    {
+      "id": 656,
+      "orderId": 2352,
+      "createdAt": "2023-12-19T13:49:23",
+      "amount": 20.00
+    },
+    {
+      "id": 657,
+      "orderId": 2351,
+      "createdAt": "2023-12-19T13:46:33",
+      "amount": 10.00
+    },
+    {
+      "id": 658,
+      "orderId": 2350,
+      "createdAt": "2023-12-19T13:25:02",
+      "amount": 5.00
+    },
+    {
+      "id": 659,
+      "orderId": 2349,
+      "createdAt": "2023-12-19T13:20:25",
+      "amount": 10.00
+    },
+    {
+      "id": 660,
+      "orderId": 2348,
+      "createdAt": "2023-12-19T13:15:12",
+      "amount": 10.00
+    },
+    {
+      "id": 661,
+      "orderId": 2347,
+      "createdAt": "2023-12-19T13:05:30",
+      "amount": 25.00
+    },
+    {
+      "id": 662,
+      "orderId": 2346,
+      "createdAt": "2023-12-19T12:56:39",
+      "amount": 25.00
+    },
+    {
+      "id": 663,
+      "orderId": 2345,
+      "createdAt": "2023-12-19T12:54:38",
+      "amount": 10.00
+    },
+    {
+      "id": 664,
+      "orderId": 2344,
+      "createdAt": "2023-12-19T12:48:02",
+      "amount": 10.00
+    },
+    {
+      "id": 665,
+      "orderId": 2343,
+      "createdAt": "2023-12-19T12:22:27",
+      "amount": 10.00
+    },
+    {
+      "id": 666,
+      "orderId": 2342,
+      "createdAt": "2023-12-19T12:14:38",
+      "amount": 10.00
+    },
+    {
+      "id": 667,
+      "orderId": 2341,
+      "createdAt": "2023-12-19T11:33:34",
+      "amount": 10.00
+    },
+    {
+      "id": 668,
+      "orderId": 2340,
+      "createdAt": "2023-12-19T10:58:56",
+      "amount": 30.00
+    },
+    {
+      "id": 669,
+      "orderId": 2339,
+      "createdAt": "2023-12-19T09:50:49",
+      "amount": 15.00
+    },
+    {
+      "id": 670,
+      "orderId": 2338,
+      "createdAt": "2023-12-19T08:33:00",
+      "amount": 30.00
+    },
+    {
+      "id": 671,
+      "orderId": 2337,
+      "createdAt": "2023-12-19T07:30:45",
+      "amount": 20.00
+    },
+    {
+      "id": 672,
+      "orderId": 2336,
+      "createdAt": "2023-12-19T06:53:43",
+      "amount": 20.00
+    }
+  ],
+  "totalOrders": 1240.00,
+  "totalCredits": 54.00,
+  "totalExpenses": 112.50,
+  "totalShift": 1073.50,
+  "createdAt": "2024-01-15T09:09:01.784149",
+  "closed_at": "2024-01-15T13:25:58.107403",
+  "closed": true
+}
+```
+
+If there is no shift by that ID
+
+```json
+{
+    "message": "No shift by that Id",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-27T12:17:56.851261953Z"
+}
+```
+
+
+## Credit module
+A Credit is money that customers will pay at later time .
+A credit have:
+- user: A FK Indicating who the user who created the credit is, and he will be responsible for it
+- amount: a BigDecimal of the amount of the credit.
+- description: a String indicating any other information about the credit
+- createdAt: a LocalDateTime  indicating the exact time the credit was created at.
+- shift: a FK indicating which shift this credit belongs to.
+
+All the upcoming requests must be sent with jwt token in Authorization Headers
+user has its getter overriden to return only the username 
+shift is annotated with @JsonBackReference and fetched lazily because we don't want to access the shift information from this side
+
+## Adding a new Credit
+
+URL POST /api/v1/credit/add
+
+Body:
+
+```json
+{
+    "amount":13.5,
+    "description":"new credit",
+    "shift":{
+        "id": 15
+    }
+}
+```
+
+Response:
+
+```json
+{
+    "amount": 13.5,
+    "description": "new credit",
+    "createdAt": "2024-01-29T21:15:13.727030007",
+    "id": 25,
+    "user": "mohamed"
+}
+```
+
+If the request is sent with a shift id that is closed
+
+```json
+{
+    "message": "This Shift is closed open it first and then modify",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-29T19:17:33.31082058Z"
+}
+```
+
+If the shift does not exist
+
+```json
+{
+    "message": "No Shift with that Id",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-29T19:23:15.932147641Z"
+}
+```
+
+If any of the required fields are missing from the body
+
+```json
+{
+    "message": "amount cannot bel blank or null, You must enter a Shift id",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-29T19:27:28.260770024Z"
+}
+```
+
+### Retrieving a credit
+
+URL GET /api/v1/credit/retrieve/{credit id}
+
+````json
+{
+    "amount": 13.50,
+    "description": "new credit",
+    "createdAt": "2024-01-29T21:15:13.72703",
+    "id": 25,
+    "user": "mohamed"
+}
+````
+
+if the credit does not exist
+
+```json
+{
+  "message": "No Credit with that ID",
+  "httpStatus": "BAD_REQUEST",
+  "timestamp": "2024-01-29T19:28:36.966672487Z"
+}
+```
+
+
+### Listing credits
+
+url GET /api/v1/credit/list?page={page number}
+
+response:
+```json
+[
+    {
+        "id": 17,
+        "amount": 13.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T09:10:46.472687"
+    },
+    {
+        "id": 18,
+        "amount": 13.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T09:10:47.564461"
+    },
+    {
+        "id": 19,
+        "amount": 13.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T09:10:48.477856"
+    },
+    {
+        "id": 20,
+        "amount": 13.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T09:10:49.414302"
+    },
+    {
+        "id": 21,
+        "amount": 13.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T13:45:33.873531"
+    },
+    {
+        "id": 22,
+        "amount": 13.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T13:45:35.455034"
+    },
+    {
+        "id": 23,
+        "amount": 13.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T13:45:36.390855"
+    },
+    {
+        "id": 24,
+        "amount": 13.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T13:45:37.324064"
+    },
+    {
+        "id": 25,
+        "amount": 13.50,
+        "description": "new credit",
+        "createdAt": "2024-01-29T21:15:13.72703"
+    }
+]
+```
+
+note that pagination here is required if the request is sent without the page query parameter
+
+```json
+{
+    "message": "Specify the page",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-29T19:31:36.69374047Z"
+}
+```
+
+there is also an optional start_date, end_date query parameters to filter credits based on dates and shift_id to filter based on a specific shift 
+
+### Updating a credit 
+
+URL PUT /api/v1/credit/update
+
+Body:
+
+```json
+{
+    "id":12,
+    "amount":444.5,
+    "description":"updated",
+    "shift":{
+        "id": 15
+    }
+}
+```
+
+all the fields are optional so the user can update only the fields he requires
+
+response
+
+```json
+{
+    "amount": 444.5,
+    "description": "updated",
+    "createdAt": "2024-01-29T21:15:13.72703",
+    "id": 25,
+    "user": "mohamed"
+}
+```
+If the credit does not exist
+
+```json
+{
+    "message": "No Credit with that ID",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-29T19:48:11.360394174Z"
+}
+```
+
+if the user trying to modify the credit is not the one who created it
+
+```json
+{
+    "message": "Only the user who created the credit can modify it",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-29T19:49:17.90073539Z"
+}
+```
+
+If the new shift is closed 
+
+```json
+{
+    "message": "This Shift is closed open it first and then modify",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-29T19:50:07.590163355Z"
+}
+```
+
+### Deleting a credit
+
+URL DELETE /api/v1/credit/delete/{credit ID}
+
+you will receive an empty response with a status of 204 No Content
+
+if the user trying to delete is not the one who created the credit
+
+```json
+{
+    "message": "Only the user who created the credit can delete it",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-29T19:52:30.98539982Z"
+}
+```
+
+if the credit does not exist
+
+```json
+{
+    "message": "No credit with that ID",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-29T19:53:20.789739619Z"
+}
+```
+
+
+
+
 
