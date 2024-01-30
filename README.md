@@ -729,7 +729,7 @@ If there is no shift by that ID
 
 ## Credit module
 A Credit is money that customers will pay at later time .
-A credit have:
+A credit has:
 - user: A FK Indicating who the user who created the credit is, and he will be responsible for it
 - amount: a BigDecimal of the amount of the credit.
 - description: a String indicating any other information about the credit
@@ -899,6 +899,17 @@ note that pagination here is required if the request is sent without the page qu
 
 there is also an optional start_date, end_date query parameters to filter credits based on dates and shift_id to filter based on a specific shift 
 
+if sent with the wrong date time format
+
+```json
+{
+    "message": "Wrong date format, the correct format is yyyy-MM-ddTHH:mm:ss",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-30T14:01:28.958102856Z"
+}
+```
+
+
 ### Updating a credit 
 
 URL PUT /api/v1/credit/update
@@ -985,6 +996,298 @@ if the credit does not exist
 }
 ```
 
+
+## Expense module
+An Expense is money that the person responsible for shift has bought necessities with .
+An expense has:
+- user: A FK Indicating who the user who created the expense is, and he will be responsible for it
+- amount: a BigDecimal of the amount of the expense.
+- description: a String indicating any other information about the expense
+- createdAt: a LocalDateTime  indicating the exact time the expense was created at.
+- shift: a FK indicating which shift this expense belongs to.
+
+All the upcoming requests must be sent with jwt token in Authorization Headers
+user has its getter overriden to return only the username
+shift is annotated with @JsonBackReference and fetched lazily because we don't want to access the shift information from this side
+
+### Adding a new expense
+
+URL POST /api/v1/expense/add
+
+body
+
+```json
+{
+    "amount":12.5,
+    "description":"new expense",
+    "shift":{
+        "id": 15
+    }
+}
+```
+
+response
+
+```json
+{
+    "id": 25,
+    "user": "mohamed",
+    "amount": 12.5,
+    "description": "new expense",
+    "createdAt": "2024-01-30T15:47:51.671672166"
+}
+```
+
+if any of the required fields are not present in the body
+
+```json
+{
+    "message": "You must enter a Shift id, amount cannot bel blank or null",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-30T13:48:58.522559849Z"
+}
+```
+
+if the shift does not exist
+
+```json
+{
+    "message": "No Shift with that Id",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-30T13:49:32.733505562Z"
+}
+```
+
+if the shift is closed
+
+```json
+{
+    "message": "This Shift is closed open it first and then modify",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-30T13:55:26.671760264Z"
+}
+```
+
+### Listing expenses
+
+URL GET /api/v1/expense/list?page=0
+
+response:
+
+```json
+[
+    {
+        "id": 16,
+        "amount": 12.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T09:10:31.833369"
+    },
+    {
+        "id": 17,
+        "amount": 12.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T09:10:32.901406"
+    },
+    {
+        "id": 18,
+        "amount": 12.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T09:10:33.800461"
+    },
+    {
+        "id": 19,
+        "amount": 12.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T09:11:35.881764"
+    },
+    {
+        "id": 20,
+        "amount": 12.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T09:12:34.404652"
+    },
+    {
+        "id": 21,
+        "amount": 12.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T09:13:23.721623"
+    },
+    {
+        "id": 22,
+        "amount": 12.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T09:14:27.579661"
+    },
+    {
+        "id": 23,
+        "amount": 12.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T09:27:50.127319"
+    },
+    {
+        "id": 24,
+        "amount": 12.50,
+        "description": "adfadcad",
+        "createdAt": "2024-01-15T09:28:54.58553"
+    },
+    {
+        "id": 25,
+        "amount": 12.50,
+        "description": "new expense",
+        "createdAt": "2024-01-30T15:47:51.671672"
+    }
+]
+```
+
+Pagination is mandatory if you sent the request without the page query parameter
+
+```json
+{
+    "message": "Specify the page",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-30T13:57:30.635129952Z"
+}
+```
+
+there is also an optional start_date, end_date query parameters to filter credits based on dates and shift_id to filter based on a specific shift 
+
+if sent with the wrong date time format
+
+```json
+{
+    "message": "Wrong date format, the correct format is yyyy-MM-ddTHH:mm:ss",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-30T14:01:28.958102856Z"
+}
+```
+
+### Retrieving an expense
+
+URL GET /api/v1/expense/retrieve/{expense ID}
+
+response
+
+```json
+    "id": 25,
+    "user": "mohamed",
+    "amount": 12.50,
+    "description": "new expense",
+    "createdAt": "2024-01-30T15:47:51.671672"
+}
+```
+
+if there is no expense with the specified ID
+
+```json
+{
+    "message": "No Expense with that ID",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-30T14:17:25.251085624Z"
+}
+```
+
+### Update an expense
+
+URL PUT /api/v1/expense/update 
+
+Body
+
+```json
+{
+  "id": 25,
+  "amount": 1444.50,
+  "description": "updated",
+  "createdAt": "2024-12-30T13:40:50.520532",
+  "shift":{
+    "id": 15
+  }
+}
+```
+
+all the fields are optional so the user can update only the fields he requires
+
+
+response
+
+```json
+{
+    "id": 25,
+    "user": "mohamed",
+    "amount": 1444.50,
+    "description": "updated",
+    "createdAt": "2024-01-30T15:47:51.671672"
+}
+```
+
+Note that created at did not update
+
+if there is no credit with that ID
+
+```json
+{
+    "message": "No Expense with that ID",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-30T17:16:19.559175325Z"
+}
+```
+
+if the user who sent the request is not the one who created it
+
+```json
+{
+    "message": "Only the user who created the expense can modify it",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-30T17:17:32.346811873Z"
+}
+```
+
+if the shift does not exist
+
+```json
+{
+    "message": "No Shift by that ID",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-30T17:21:53.74320946Z"
+}
+```
+
+if the shift is closed
+
+```json
+{
+    "message": "This Shift is closed open it first and then modify",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-30T17:22:16.727909752Z"
+}
+```
+
+### Deleting a expense
+
+URL DELETE /api/v1/expense/delete/{expense ID}
+
+response empty with a status code of http 204 no content
+
+
+if no expense with that ID
+
+
+```json
+{
+    "message": "No expense with that ID",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-30T17:23:38.46405758Z"
+}
+```
+
+
+If the user who sent the request is not the user who created the expense
+```json
+{
+    "message": "Only the user who created the expense can delete it",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-01-30T17:24:09.810565304Z"
+}
+```
 
 
 

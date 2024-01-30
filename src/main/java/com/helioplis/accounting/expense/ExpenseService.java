@@ -28,17 +28,15 @@ public class ExpenseService {
     private final  ExpenseMapper mapper;
 
     public Expense addNewExpense(Expense expense){
-        Shift shift =  expense.getShift();
-        System.out.println(shift.getId());
-        shiftRepo.findById(shift.getId()).orElseThrow(() -> new ApiRequestException("No Shift with that Id"));
-        System.out.println(shift.isClosed());
+
+        Shift shift = shiftRepo.findById(expense.getShift().getId()).orElseThrow(() -> new ApiRequestException("No Shift with that Id"));
         if (shift.isClosed()){
             throw new ApiRequestException("This Shift is closed open it first and then modify");
         }
         return expenseRepo.save(expense);
     }
 
-    List<ExpenseListDTO> listExpenses(String s_date, String e_date,Integer shiftId, Integer page)
+    List<Expense> listExpenses(String s_date, String e_date,Integer shiftId, Integer page)
     {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         LocalDateTime start_date = null;
@@ -53,9 +51,9 @@ public class ExpenseService {
         } catch (DateTimeParseException e){
             throw new ApiRequestException("Wrong date format, the correct format is yyyy-MM-ddTHH:mm:ss", e);
         }
-        List<Expense> expenses =  expenseRepo.findFilter(start_date,end_date,shiftId, PageRequest.of(page, 10));
+        return  expenseRepo.findFilter(start_date,end_date,shiftId, PageRequest.of(page, 10));
 
-        return  expenses.stream().map(this :: convertToDTO).collect(Collectors.toList());
+//        return  expenses.stream().map(this :: convertToDTO).collect(Collectors.toList());
 
     }
 
