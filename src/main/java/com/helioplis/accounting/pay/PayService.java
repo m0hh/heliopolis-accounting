@@ -1,6 +1,7 @@
 package com.helioplis.accounting.pay;
 
 import com.google.firebase.messaging.FirebaseMessagingException;
+import com.helioplis.accounting.exeption.ApiRequestException;
 import com.helioplis.accounting.firebase.FirebaseMessagingService;
 import com.helioplis.accounting.firebase.Note;
 import com.helioplis.accounting.security.jwt.entity.UserHelioplis;
@@ -61,5 +62,9 @@ public class PayService {
             }
         }
 
+    }
+
+    public Pay retrievePay(Integer payId){
+        return payRepo.findById(payId).orElseThrow(() -> new ApiRequestException("No Pay by that Id"));
     }
 }

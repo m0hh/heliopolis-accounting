@@ -1289,6 +1289,249 @@ If the user who sent the request is not the user who created the expense
 }
 ```
 
+## Order module
+An Order is an item that a customer has purchases it comes in the form of an external excel sheet that comes from another system and is attached to a shift.
+An Order has:
+- orderId: an Integer indicating the ID of that order in the external system
+- createdAt: a LocalDateTime indicating the time which this order was created at.
+- amount: a BigDecimal Indicating the amount of the order 
+
+All the upcoming requests must be sent with jwt token in Authorization Headers
+shift is annotated with @JsonBackReference and fetched lazily because we don't want to access the shift information from this side
+
+
+### Adding Orders From Excel
+
+URL POST /api/v1/order/add
+
+Body Form Data
+file : excel file
+shift_id: id of the shift 
+
+Response:
+Executed
+status code:
+200 Ok
+
+The method to add data from the Excel file executes in a separate thread so the response will be immediate and when a successful operation is done a Fire Base Push Notification is sent to the user who created the request
+also if there is any errors in the file, like missing values, a push notification will be sent as will. See the section about configuring Fire Base Push Notification.
+
+If there is no file sent with the request
+```json
+{
+    "message": "File is required in the request",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-02-06T10:59:49.785299919Z"
+}
+```
+
+If there is no shift_id sent with request
+```json
+{
+    "message": "Shift ID is required in the request",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-02-06T11:00:28.391588119Z"
+}
+```
+
+If the file is not in excel format
+```json
+{
+    "message": "The input file must be excel format",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-02-06T11:01:19.436810649Z"
+}
+```
+
+If there is no shift by that ID
+```json
+{
+    "message": "No shift is by that id",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-02-06T11:01:44.401779319Z"
+}
+```
+
+If the shift is closed 
+```json
+{
+    "message": "This Shift is closed modify it first",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-02-06T11:02:04.846839378Z"
+}
+```
+
+### Listing Orders
+
+URL GET /api/v1/order/list?page={Page number}
+
+response
+
+```json
+[
+    {
+        "id": 627,
+        "orderId": 2381,
+        "createdAt": "2023-12-19T19:23:34",
+        "amount": 10.00
+    },
+    {
+        "id": 628,
+        "orderId": 2380,
+        "createdAt": "2023-12-19T19:17:55",
+        "amount": 40.00
+    },
+    {
+        "id": 629,
+        "orderId": 2379,
+        "createdAt": "2023-12-19T19:11:42",
+        "amount": 10.00
+    },
+    {
+        "id": 630,
+        "orderId": 2378,
+        "createdAt": "2023-12-19T19:00:55",
+        "amount": 15.00
+    },
+    {
+        "id": 631,
+        "orderId": 2377,
+        "createdAt": "2023-12-19T18:59:14",
+        "amount": 10.00
+    },
+    {
+        "id": 632,
+        "orderId": 2376,
+        "createdAt": "2023-12-19T18:51:10",
+        "amount": 30.00
+    },
+    {
+        "id": 633,
+        "orderId": 2375,
+        "createdAt": "2023-12-19T18:49:28",
+        "amount": 10.00
+    },
+    {
+        "id": 634,
+        "orderId": 2374,
+        "createdAt": "2023-12-19T18:48:55",
+        "amount": 30.00
+    },
+    {
+        "id": 635,
+        "orderId": 2373,
+        "createdAt": "2023-12-19T18:28:50",
+        "amount": 25.00
+    },
+    {
+        "id": 636,
+        "orderId": 2372,
+        "createdAt": "2023-12-19T18:27:57",
+        "amount": 5.00
+    }
+]
+```
+
+Paging is mandatory otherwise you will receive this
+
+```json
+{
+    "message": "Specify the page",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-02-06T11:15:20.56692394Z"
+}
+```
+
+also there is start_date, end_date and shift_id optional query params to filter by
+
+### Updating an order
+
+There is no option to delete an order because that is money incoming so to limit foul play you can only update it and make it amount zero if it is deleted in the external system.
+
+URL PUT 
+Body:
+```json
+{
+    "id": 635,
+    "orderId": 2391,
+    "createdAt": "2023-12-19T22:56:43",
+    "amount": 24444.00
+}
+```
+
+response:
+
+```json
+{
+    "id": 635,
+    "orderId": 2373,
+    "createdAt": "2023-12-19T18:28:50",
+    "amount": 24444.00
+}
+```
+
+note that the createdAt and orderId does not change.
+
+if there is no order with that ID
+
+```json
+{
+    "message": "No Order with that ID",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-02-06T11:19:46.066796068Z"
+}
+```
+
+if shift is closed
+
+```json
+{
+    "message": "This Shift is closed open it first and then modify",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-02-06T14:54:19.434953268Z"
+}
+```
+
+### Retrieve Order
+
+URL GET /api/v1/order/retrieve/{order ID}
+
+response:
+
+```json
+{
+    "id": 638,
+    "orderId": 2370,
+    "createdAt": "2023-12-19T18:12:00",
+    "amount": 50.00
+}
+```
+
+if no order exist with that ID
+
+```json
+{
+    "message": "No Order with that Id",
+    "httpStatus": "BAD_REQUEST",
+    "timestamp": "2024-02-06T14:57:24.901872602Z"
+}
+```
+
+## Pay Module
+A Pay is the monthly pay that the users receive it is calculated by adding all the hours a user has worked in his shifts and then multiply that by his hourly rate which we get from the user table it also calculates his total
+deduction and the totality of the hours he worked at, all of that is calculated by a scheduler that runs once every month and alerts the users that their pay is calculated by a Fire Base push notification.
+A Pay has:
+- totalHours: an Integer indicating the totality of the hours he worked this month
+- totalPay: a BigDecimal indicating his total pay.
+- totalDeduction: a BigDecimal indicating his total deduction
+- createdAt: a LocalDate indicating the date
+- user: the user who his pay is being calculated
+- shifts: a one-to-many relationship indicating the shifts he worked at
+
+
+
+
+
 
 
 

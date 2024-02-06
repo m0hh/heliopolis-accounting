@@ -38,7 +38,10 @@ public class OrderService {
 
     public Order updateOrder(OrderUpdateDTO dto) {
         Order myOrder = orderRepo.findById(dto.getId()).orElseThrow(() -> new ApiRequestException("No Order with that ID"));
-
+        Shift shift1 = shiftRepo.findById(myOrder.getShift().getId()).orElseThrow(()-> new ApiRequestException("No Shift by that ID"));
+        if (shift1.isClosed()){
+            throw new ApiRequestException("This Shift is closed open it first and then modify");
+        }
         if (dto.getShift() != null){
             Integer shiftId = dto.getShift().getId();
             Shift shift = shiftRepo.findById(shiftId).orElseThrow(()-> new ApiRequestException("No Shift by that ID"));
