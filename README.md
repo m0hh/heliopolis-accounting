@@ -24,6 +24,76 @@ and that it's more efficient performance wise to execute data intensive logic in
 natively instead of HQL or JPQL is that first I want to get good at SQL since I am nowhere where I need to be right now and second because I believe the performance hit from translating the aforementioned
 queries to native SQL queries is not worth it, since I don't plan to change my database of choice (PostgreSQL) mid-production, and I believe It's a rarity anyway.
 
+- I've coded the jwt logic myself instead of relying on ouath2 because I wanted to familiarize myself with underlying architecture
+
+- Because this is a closed system all endpoints require authentication except login. to authenticate a request send an Authorization Header with token directly without prefixing with token or bearer
+
+## User Module
+- username: the username of the user
+- password: the password of the user
+- email: the email
+- roles: roles like Admin or Manager
+- hourlyRate: an Integer describing how much money does he make an hour
+- hoursToWork: an Integer of his total hours of supposed work in a month
+
+## SignUp
+
+because a only the admin can signup new users the signup must be sent with a token of an admin. the admin himself must be inserted manually in the database.
+Send a POST request to /user/saveUser
+body :
+```json
+{
+"username": "test",
+"password": "test4321",
+"email": "example@gmail.com",
+"roles": ["Manager"],
+"hourlyRate": 50,
+"hoursToWork": 186
+}
+```
+
+response:
+```
+User with id '8' saved succssfully!
+```
+### Login
+
+Send a POST request to  /user/loginUser
+
+body:
+
+```json
+{
+"username": "test",
+"password": "test4321"
+}
+```
+
+response:
+
+```json
+{
+    "token": "eyJhbGciOiJIUzUxMiJ9.eyJqdGkiOiI3ODkwIiwic3ViIjoibW9oYW1lZCIsImlzcyI6IkFCQ19MdGQiLCJhdWQiOiJYWVpfTHRkIiwiaWF0IjoxNzEzNTU3MjQxLCJleHAiOjE3MTM1NjA4NDF9.ZLaw4YjbIyWy0nqjLohsj-F839F1kvsD6lgjdcwGgil_ww4GT8zM_wyEcQev0-Jbhnvi_cei7l8M_KfuA2Zusg",
+    "message": "Token generated successfully!"
+}
+```
+
+### Adding Firbase Token
+
+send a POST request to /user/fb_token with the token in headers
+body:
+
+```json
+{
+    "firebaseToken": "adcacdsdcvsda"
+}
+```
+
+response:
+```
+Saved
+```
+
 ## Shift module
 A shift is the shift that all the expenses and credits and orders will be added to it and at the end of the day the 
 totality of the shift will be calculated.
