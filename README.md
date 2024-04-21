@@ -24,7 +24,7 @@ and that it's more efficient performance wise to execute data intensive logic in
 natively instead of HQL or JPQL is that first I want to get good at SQL since I am nowhere where I need to be right now and second because I believe the performance hit from translating the aforementioned
 queries to native SQL queries is not worth it, since I don't plan to change my database of choice (PostgreSQL) mid-production, and I believe It's a rarity anyway.
 
-- I've coded the jwt logic myself using the jwts library instead of relying on ouath2 because I wanted to familiarize myself with underlying architecture
+- I've coded the jwt logic myself using the jjwt library instead of relying on ouath2 because I wanted to familiarize myself with underlying architecture
 
 - Because this is a closed system all endpoints require authentication except login. to authenticate a request send an Authorization Header with token directly without prefixing with Token or Bearer
 
