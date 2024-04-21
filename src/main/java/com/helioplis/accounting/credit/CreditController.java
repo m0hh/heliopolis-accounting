@@ -26,7 +26,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Slf4j
 public class CreditController {
-    @Autowired
     private final CreditService creditService;
     private final UserRepository userRepository;
     @PostMapping("add")

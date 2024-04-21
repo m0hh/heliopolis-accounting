@@ -35,7 +35,6 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Slf4j
 public class ExpenseController {
-    @Autowired
     private final ExpenseService expenseService;
     private final UserRepository userRepository;
     @PostMapping("add")
